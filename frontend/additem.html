@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Item - Flower Shop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Add Item Page Specific Styles */
+        .add-item-section {
+            min-height: calc(100vh - 80px);
+            background: linear-gradient(135deg, #fdf6f6 0%, #f5e6e6 100%);
+            padding: 60px 0;
+        }
+
+        .add-item-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(212, 165, 165, 0.2);
+            padding: 50px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        .form-header .icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group label .required {
+            color: #d4a5a5;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #f0e6e6;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #fdfafa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #d4a5a5;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(212, 165, 165, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #d4a5a5 0%, #c99393 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #c99393 0%, #b88282 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 165, 165, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit i {
+            margin-right: 10px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #d4a5a5;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .add-item-container {
+                margin: 0 20px;
+                padding: 30px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="nav-links">
+                    <a href="index.html">HOME</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#bouquets">BOUQUETS</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#contact">CONTACT</a>
+                </div>
+                <div class="logo">YOURLOGO</div>
+                <div class="nav-right">
+                    <a href="index.html" class="cart-btn">
+                        <i class="fas fa-home"></i> BACK TO SHOP
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Add Item Section -->
+    <section class="add-item-section">
+        <div class="container">
+            <div class="add-item-container">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Shop
+                </a>
+
+                <div class="form-header">
+                    <div class="icon">🌸</div>
+                    <h1>Add New Item</h1>
+                    <p>Add a beautiful flower or bouquet to your collection</p>
+                </div>
+
+                <div id="successMessage" class="success-message">
+                    <i class="fas fa-check-circle"></i> Item added successfully!
+                </div>
+
+                <div id="errorMessage" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i> Error adding item. Please try again.
+                </div>
+
+                <form id="addItemForm">
+                    <div class="form-group">
+                        <label for="itemName">Item Name <span class="required">*</span></label>
+                        <input type="text" id="itemName" name="itemName" placeholder="e.g., Romantic Rose Bouquet"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category <span class="required">*</span></label>
+                        <select id="category" name="category" required>
+                            <option value="">Select a category</option>
+                            <option value="roses">Roses</option>
+                            <option value="tulips">Tulips</option>
+                            <option value="lilies">Lilies</option>
+                            <option value="orchids">Orchids</option>
+                            <option value="sunflowers">Sunflowers</option>
+                            <option value="mixed">Mixed Bouquets</option>
+                            <option value="seasonal">Seasonal Flowers</option>
+                            <option value="plants">Plants</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description <span class="required">*</span></label>
+                        <textarea id="description" name="description" placeholder="Describe your flower arrangement..."
+                            required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="price">Price ($) <span class="required">*</span></label>
+                            <input type="number" id="price" name="price" placeholder="29.99" step="0.01" min="0"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantity">Quantity <span class="required">*</span></label>
+                            <input type="number" id="quantity" name="quantity" placeholder="10" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imageUrl">Image URL (optional)</label>
+                        <input type="url" id="imageUrl" name="imageUrl" placeholder="https://example.com/image.jpg">
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyATGZZIFmo63NoKmREdQmF4_2JJMlm6pQM",
+            authDomain: "flora-de713.firebaseapp.com",
+            projectId: "flora-de713",
+            storageBucket: "flora-de713.firebasestorage.app",
+            messagingSenderId: "993675243646",
+            appId: "1:993675243646:web:57f9c90cc9d9c0251ee82f",
+            measurementId: "G-DNZ03J2EL8"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Form submission handler
+        document.getElementById('addItemForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const submitBtn = document.querySelector('.btn-submit');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Hide previous messages
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+            // Get form data
+            const product = {
+                name: document.getElementById('itemName').value.trim(),
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value.trim(),
+                price: parseFloat(document.getElementById('price').value),
+                quantity: parseInt(document.getElementById('quantity').value),
+                imageUrl: document.getElementById('imageUrl').value.trim() || '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                // Add to Firestore
+                const docRef = await db.collection('products').add(product);
+                console.log('Product added with ID:', docRef.id);
+
+                // Show success message
+                successMessage.style.display = 'block';
+
+                // Reset form
+                this.reset();
+
+                // Scroll to top to show success message
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Error adding product:', error);
+                errorMessage.style.display = 'block';
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Item';
+            }
+        });
+    </script>
+</body>
+
+</html>

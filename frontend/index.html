@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flower Shop - A Bouquet of Love</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="nav-links">
+                    <a href="#home">HOME</a>
+                    <a href="#about">ABOUT</a>
+                    <a href="#bouquets">BOUQUETS</a>
+                    <a href="#blog">BLOG</a>
+                    <a href="#contact">CONTACT</a>
+                </div>
+                <div class="logo">YOURLOGO</div>
+                <div class="nav-right">
+                    <button class="cart-btn" id="cartBtn">
+                        CART (<span id="cartCount">0</span>)
+                    </button>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <img src="../assets/banner.jpg" alt="Woman holding bouquet" class="hero-bg-image">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-left">
+                    <h1 class="hero-title">a bouquet<br>of love</h1>
+                    <p class="hero-text">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                        accusantium doloremque laudantium.
+                    </p>
+                    <div class="hero-buttons">
+                        <button class="btn-primary">Bouquet</button>
+                        <button class="btn-secondary">Read more</button>
+                    </div>
+                </div>
+                <div class="hero-center">
+                </div>
+                <div class="hero-right">
+                    <div class="vertical-text">FLOWER SHOP</div>
+                    <div class="hero-badge">
+                        <p>Sense of<br>bouquet</p>
+                    </div>
+                    <div class="discount-badge">
+                        <p>Get a discount on<br>your first purchase</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="floating-petals">
+            <span class="petal">🌷</span>
+            <span class="petal">🌸</span>
+            <span class="petal">🍃</span>
+            <span class="petal">🍂</span>
+            <span class="petal">💐</span>
+            <span class="petal">🌸</span>
+            <span class="petal">🌹</span>
+            <span class="petal">🌸</span>
+            <span class="petal">💐</span>
+            <span class="petal">🍂</span>
+            <span class="petal">🌹</span>
+            <span class="petal">🍃</span>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products" id="bouquets">
+        <div class="container">
+            <h2 class="section-title">Our Beautiful Flowers</h2>
+            <p class="section-subtitle">Handpicked blooms for every occasion</p>
+
+            <!-- Loading State -->
+            <div id="productsLoading" class="products-loading">
+                <div class="loading-spinner"></div>
+                <p>Loading beautiful flowers...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="productsEmpty" class="products-empty" style="display: none;">
+                <div class="empty-icon">🌸</div>
+                <h3>No flowers yet</h3>
+                <p>Add some beautiful flowers to your collection</p>
+                <a href="additem.html" class="btn-primary">Add First Item</a>
+            </div>
+
+            <!-- Products Grid - Dynamically populated -->
+            <div class="products-grid" id="productsGrid"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h3>About Us</h3>
+                    <p>Creating beautiful moments with fresh flowers since 2020. We pride ourselves on quality,
+                        creativity, and customer satisfaction.</p>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#bouquets">Bouquets</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Contact</h3>
+                    <p>📧 hello@flowershop.com</p>
+                    <p>📞 +1 (555) 123-4567</p>
+                    <p>📍 123 Flower Street, Garden City</p>
+                </div>
+                <div class="footer-col">
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#">Facebook</a>
+                        <a href="#">Instagram</a>
+                        <a href="#">Pinterest</a>
+                        <a href="#">Twitter</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Flower Shop. All rights reserved. Made with 💕</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Shopping Cart</h2>
+            <div id="cartItems"></div>
+            <div class="cart-total">
+                <strong>Total: $<span id="cartTotal">0.00</span></strong>
+            </div>
+            <button class="btn-primary checkout-btn">Checkout</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
