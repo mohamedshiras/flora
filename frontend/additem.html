@@ -597,14 +597,12 @@
 
                         <!-- Multiple Images Input -->
                         <div class="form-group">
-                            <label>Product Images (optional)</label>
+                            <label>Product Images</label>
                             <div class="images-input-container">
-                                <p style="font-size: 12px; color: #888; margin-bottom: 10px;">💡 You can paste Google
-                                    Drive share links - they'll be converted automatically!</p>
                                 <div class="url-inputs" id="imageUrlInputs">
                                     <div class="image-url-row">
                                         <input type="url" name="imageUrls[]"
-                                            placeholder="Paste Google Drive or image URL"
+                                            placeholder="Paste image URL"
                                             oninput="updatePreviewImages()" onpaste="handleImageUrlPaste(this)">
                                         <button type="button" class="remove-url" onclick="removeImageInput(this)"
                                             style="display:none;">
@@ -622,15 +620,6 @@
                         <div class="form-group">
                             <label>Available Colors (optional)</label>
                             <div class="colors-input-container" id="colorsContainer">
-                                <div class="color-input-wrapper">
-                                    <input type="color" value="#d4a5a5" onchange="updatePreviewColors()">
-                                    <input type="text" placeholder="Color name" value="Pink"
-                                        onchange="updatePreviewColors()">
-                                    <button type="button" class="remove-color" onclick="removeColor(this)"
-                                        style="display:none;">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
                                 <button type="button" class="add-color-btn" onclick="addColorInput()">
                                     <i class="fas fa-plus"></i> Add Color
                                 </button>
@@ -658,9 +647,7 @@
                             <span class="preview-category" id="previewCategory">Category</span>
                             <h4 id="previewName">Product Name</h4>
                             <p class="description" id="previewDescription">Product description will appear here...</p>
-                            <div class="preview-colors" id="previewColors">
-                                <div class="preview-color" style="background: #d4a5a5;" title="Pink"></div>
-                            </div>
+                            <div class="preview-colors" id="previewColors"></div>
                             <div class="preview-footer">
                                 <span class="preview-price" id="previewPrice">Rs.0</span>
                                 <span class="preview-stock" id="previewStock">In Stock</span>
@@ -1017,7 +1004,7 @@
             document.getElementById('previewStock').className = 'preview-stock';
             document.getElementById('previewMainImage').innerHTML = '<span class="placeholder-emoji">🎁</span>';
             document.getElementById('previewGallery').style.display = 'none';
-            document.getElementById('previewColors').innerHTML = '<div class="preview-color" style="background: #d4a5a5;" title="Pink"></div>';
+            document.getElementById('previewColors').innerHTML = '';
 
             // Reset image inputs
             const imageContainer = document.getElementById('imageUrlInputs');
@@ -1032,16 +1019,7 @@
 
             // Reset color inputs
             const colorContainer = document.getElementById('colorsContainer');
-            const addBtn = colorContainer.querySelector('.add-color-btn');
-            colorContainer.innerHTML = '';
             colorContainer.innerHTML = `
-                <div class="color-input-wrapper">
-                    <input type="color" value="#d4a5a5" onchange="updatePreviewColors()">
-                    <input type="text" placeholder="Color name" value="Pink" onchange="updatePreviewColors()">
-                    <button type="button" class="remove-color" onclick="removeColor(this)" style="display:none;">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
                 <button type="button" class="add-color-btn" onclick="addColorInput()">
                     <i class="fas fa-plus"></i> Add Color
                 </button>

@@ -96,97 +96,8 @@
                 <p>Loading products...</p>
             </div>
 
-            <!-- Category Sections - All 8 Categories -->
-            <div id="categorySections">
-                <!-- 1. Scrunchies -->
-                <div class="category-section" id="category-scrunchies">
-                    <div class="category-header">
-                        <span class="category-icon">🎀</span>
-                        <h3>1. Scrunchies</h3>
-                        <p class="category-pricing">Small Pack (6pcs) - Rs.1000 | Medium (12pcs) - Rs.1900 | Large (24pcs) - Rs.3900 | Single - Rs.180</p>
-                        <p class="category-offer">🎄 Christmas Offer: Buy 3 get 1 FREE for Rs.450!</p>
-                    </div>
-                    <div class="products-grid" data-category="scrunchies"></div>
-                    <div class="category-empty">No scrunchies available yet</div>
-                </div>
-
-                <!-- 2. Keytags -->
-                <div class="category-section" id="category-keytags">
-                    <div class="category-header">
-                        <span class="category-icon">🔑</span>
-                        <h3>2. Keytags</h3>
-                        <p class="category-pricing">Rs.50 - Rs.100</p>
-                    </div>
-                    <div class="products-grid" data-category="keytags"></div>
-                    <div class="category-empty">No keytags available yet</div>
-                </div>
-
-                <!-- 3. Fancy Hair Clips -->
-                <div class="category-section" id="category-hairclips">
-                    <div class="category-header">
-                        <span class="category-icon">💇</span>
-                        <h3>3. Fancy Hair Clips</h3>
-                        <p class="category-pricing">2 pcs - Rs.120</p>
-                    </div>
-                    <div class="products-grid" data-category="hairclips"></div>
-                    <div class="category-empty">No hair clips available yet</div>
-                </div>
-
-                <!-- 4. Flower Bouquets -->
-                <div class="category-section" id="category-flowerbouquets">
-                    <div class="category-header">
-                        <span class="category-icon">💐</span>
-                        <h3>4. Flower Bouquets</h3>
-                        <p class="category-pricing">Pipe Cleaner & Ribbon Flower Bouquets</p>
-                    </div>
-                    <div class="products-grid" data-category="flowerbouquets"></div>
-                    <div class="category-empty">No flower bouquets available yet</div>
-                </div>
-
-                <!-- 5. Flower Pots -->
-                <div class="category-section" id="category-flowerpots">
-                    <div class="category-header">
-                        <span class="category-icon">🌸</span>
-                        <h3>5. Flower Pots</h3>
-                        <p class="category-pricing">Beautiful decorative flower pots</p>
-                    </div>
-                    <div class="products-grid" data-category="flowerpots"></div>
-                    <div class="category-empty">No flower pots available yet</div>
-                </div>
-
-                <!-- 6. Customized Gift Boxes -->
-                <div class="category-section" id="category-giftboxes">
-                    <div class="category-header">
-                        <span class="category-icon">🎁</span>
-                        <h3>6. Customized Gift Boxes</h3>
-                        <p class="category-pricing">Personalized gift boxes for all occasions</p>
-                    </div>
-                    <div class="products-grid" data-category="giftboxes"></div>
-                    <div class="category-empty">No gift boxes available yet</div>
-                </div>
-
-                <!-- 7. Customized Choco Boxes -->
-                <div class="category-section" id="category-chocoboxes">
-                    <div class="category-header">
-                        <span class="category-icon">🍫</span>
-                        <h3>7. Customized Choco Boxes</h3>
-                        <p class="category-pricing">Custom chocolate boxes for special moments</p>
-                    </div>
-                    <div class="products-grid" data-category="chocoboxes"></div>
-                    <div class="category-empty">No choco boxes available yet</div>
-                </div>
-
-                <!-- 8. Customized Choco Bouquets -->
-                <div class="category-section" id="category-chocobouquets">
-                    <div class="category-header">
-                        <span class="category-icon">🍬</span>
-                        <h3>8. Customized Choco Bouquets</h3>
-                        <p class="category-pricing">Beautiful chocolate bouquets for gifting</p>
-                    </div>
-                    <div class="products-grid" data-category="chocobouquets"></div>
-                    <div class="category-empty">No choco bouquets available yet</div>
-                </div>
-            </div>
+            <!-- All Category Sections -->
+            <div id="allCategorySections"></div>
         </div>
     </section>
 
@@ -294,8 +205,11 @@
         /* Product Modal Styles */
         .product-modal-content {
             max-width: 900px;
+            width: 90%;
             padding: 0;
             overflow: hidden;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .product-modal-content .close {
@@ -315,18 +229,20 @@
 
         .product-modal-body {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 0;
         }
 
         .product-modal-gallery {
             background: #f9f9f9;
             padding: 30px;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .main-image {
             width: 100%;
-            height: 350px;
+            height: 300px;
             border-radius: 15px;
             overflow: hidden;
             margin-bottom: 15px;
@@ -339,7 +255,7 @@
         .main-image img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
         }
 
         .main-image .placeholder-emoji {
@@ -348,14 +264,33 @@
 
         .image-thumbnails {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             overflow-x: auto;
             padding: 5px 0;
+            max-width: 100%;
+            flex-wrap: nowrap;
+            scrollbar-width: thin;
+            scrollbar-color: #d4a5a5 #f0f0f0;
+        }
+
+        .image-thumbnails::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .image-thumbnails::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 3px;
+        }
+
+        .image-thumbnails::-webkit-scrollbar-thumb {
+            background: #d4a5a5;
+            border-radius: 3px;
         }
 
         .image-thumbnails img {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
+            min-width: 60px;
             object-fit: cover;
             border-radius: 10px;
             cursor: pointer;

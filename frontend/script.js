@@ -201,12 +201,12 @@ function createProductCard(product) {
     `;
 }
 
-// Render all products to the grid
+// Render all products to the grid by category
 function renderProducts(products) {
+    const container = document.getElementById('allCategorySections');
     const loading = document.getElementById('productsLoading');
-    const categorySections = document.getElementById('categorySections');
 
-    if (!categorySections) return; // Not on main page
+    if (!container) return; // Not on main page
 
     // Store products globally
     allProducts = products;
@@ -214,48 +214,46 @@ function renderProducts(products) {
     // Hide loading
     if (loading) loading.style.display = 'none';
 
-    // Define all categories in order
+    // Define all 8 categories in order with display names
     const categories = [
-        'scrunchies',
-        'keytags',
-        'hairclips',
-        'flowerbouquets',
-        'flowerpots',
-        'giftboxes',
-        'chocoboxes',
-        'chocobouquets'
+        { id: 'scrunchies', name: 'Scrunchies', emoji: '🎀' },
+        { id: 'keytags', name: 'Keytags', emoji: '🔑' },
+        { id: 'hairclips', name: 'Fancy Hair Clips', emoji: '💇' },
+        { id: 'flowerbouquets', name: 'Flower Bouquets', emoji: '💐' },
+        { id: 'flowerpots', name: 'Flower Pots', emoji: '🌸' },
+        { id: 'giftboxes', name: 'Customized Gift Boxes', emoji: '🎁' },
+        { id: 'chocoboxes', name: 'Customized Choco Boxes', emoji: '🍫' },
+        { id: 'chocobouquets', name: 'Customized Choco Bouquets', emoji: '🍬' }
     ];
 
     // Group products by category
     const productsByCategory = {};
-    categories.forEach(cat => productsByCategory[cat] = []);
-    
+    categories.forEach(cat => productsByCategory[cat.id] = []);
+
     products.forEach(product => {
-        const cat = product.category?.toLowerCase();
-        if (productsByCategory[cat]) {
-            productsByCategory[cat].push(product);
+        const catId = product.category?.toLowerCase();
+        if (productsByCategory[catId]) {
+            productsByCategory[catId].push(product);
         }
     });
 
-    // Render each category
+    // Build HTML for all categories
+    let html = '';
     categories.forEach(category => {
-        const section = document.getElementById(`category-${category}`);
-        if (!section) return;
+        const categoryProducts = productsByCategory[category.id];
 
-        const grid = section.querySelector('.products-grid');
-        const emptyMsg = section.querySelector('.category-empty');
-        const categoryProducts = productsByCategory[category];
-
-        if (categoryProducts.length > 0) {
-            grid.innerHTML = categoryProducts.map(createProductCard).join('');
-            grid.style.display = 'grid';
-            if (emptyMsg) emptyMsg.style.display = 'none';
-        } else {
-            grid.innerHTML = '';
-            grid.style.display = 'none';
-            if (emptyMsg) emptyMsg.style.display = 'block';
-        }
+        html += `
+            <div class="category-block" id="cat-${category.id}">
+                <h3 class="category-title">${category.emoji} ${category.name}</h3>
+                ${categoryProducts.length > 0
+                ? `<div class="products-grid">${categoryProducts.map(createProductCard).join('')}</div>`
+                : `<p class="no-products">No ${category.name.toLowerCase()} available yet</p>`
+            }
+            </div>
+        `;
     });
+
+    container.innerHTML = html;
 }
 
 // ==================== PRODUCT MODAL ====================
@@ -392,8 +390,8 @@ window.addEventListener('keydown', function (event) {
 
 // Initialize products display with real-time updates
 function initProductsDisplay() {
-    const grid = document.getElementById('productsGrid');
-    if (!grid) return; // Not on main page
+    const container = document.getElementById('allCategorySections');
+    if (!container) return; // Not on main page
 
     // Listen for real-time updates
     listenToProducts((products) => {
