@@ -22,6 +22,9 @@
                 </div>
                 <div class="logo">HKZ MART</div>
                 <div class="nav-right">
+                    <div class="auth-links" id="authLinks">
+                        <a href="login.html" class="auth-link"><i class="fas fa-user"></i> Login</a>
+                    </div>
                     <button class="cart-btn" id="cartBtn">
                         CART (<span id="cartCount">0</span>)
                     </button>
@@ -152,7 +155,82 @@
             <div class="cart-total">
                 <strong>Total: Rs.<span id="cartTotal">0</span></strong>
             </div>
-            <button class="btn-primary checkout-btn">Checkout</button>
+            <button class="btn-primary checkout-btn" onclick="proceedToCheckout()">Place Order</button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content checkout-modal-content">
+            <span class="close" onclick="closeCheckoutModal()">&times;</span>
+            <h2>Checkout</h2>
+
+            <div class="checkout-error" id="checkoutError" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span></span>
+            </div>
+
+            <div class="checkout-step" id="addressStep">
+                <h3>Delivery Address</h3>
+                <form id="addressForm">
+                    <div class="checkout-form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="deliveryName" placeholder="Enter full name" required>
+                    </div>
+                    <div class="checkout-form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="deliveryPhone" placeholder="07X XXX XXXX" readonly>
+                    </div>
+                    <div class="checkout-form-group">
+                        <label>Address Line 1</label>
+                        <input type="text" id="addressLine1" placeholder="House/Apartment number, Street" required>
+                    </div>
+                    <div class="checkout-form-group">
+                        <label>Address Line 2</label>
+                        <input type="text" id="addressLine2" placeholder="Area, Landmark (optional)">
+                    </div>
+                    <div class="checkout-form-row">
+                        <div class="checkout-form-group">
+                            <label>City</label>
+                            <input type="text" id="city" placeholder="City" required>
+                        </div>
+                        <div class="checkout-form-group">
+                            <label>Postal Code</label>
+                            <input type="text" id="postalCode" placeholder="Postal Code">
+                        </div>
+                    </div>
+                    <div class="checkout-form-group">
+                        <label>Special Instructions (optional)</label>
+                        <textarea id="specialInstructions" placeholder="Any special delivery instructions..."
+                            rows="2"></textarea>
+                    </div>
+
+                    <div class="order-summary" id="orderSummary">
+                        <h4>Order Summary</h4>
+                        <div id="summaryItems"></div>
+                        <div class="summary-total">
+                            <span>Total:</span>
+                            <strong>Rs.<span id="summaryTotal">0</span></strong>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <span>Confirm & Place Order</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="checkout-step" id="successStep" style="display: none;">
+                <div class="order-success">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Order Placed Successfully!</h3>
+                    <p>Your order has been confirmed. We'll contact you shortly.</p>
+                    <p class="order-id">Order ID: <strong id="orderId"></strong></p>
+                    <button class="btn-primary" onclick="closeCheckoutModal(); location.reload();">
+                        Continue Shopping
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -196,6 +274,20 @@
                             <i class="fab fa-whatsapp"></i> Order via WhatsApp
                         </a>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Orders Modal -->
+    <div id="ordersModal" class="modal">
+        <div class="modal-content orders-modal-content">
+            <span class="close" onclick="closeOrdersModal()">&times;</span>
+            <h2>My Orders</h2>
+            <div class="orders-container" id="ordersContainer">
+                <div class="orders-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading your orders...</p>
                 </div>
             </div>
         </div>
@@ -448,10 +540,462 @@
                 flex-direction: column;
             }
         }
+
+        /* Checkout Modal Styles */
+        #checkoutModal {
+            overflow-y: auto;
+        }
+
+        .checkout-modal-content {
+            max-width: 500px;
+            padding: 30px;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 20px auto;
+        }
+
+        .checkout-modal-content h2 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .checkout-modal-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .checkout-error {
+            background: #ffe6e6;
+            color: #d35050;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkout-form-group {
+            margin-bottom: 18px;
+        }
+
+        .checkout-form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .checkout-form-group input,
+        .checkout-form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .checkout-form-group input:focus,
+        .checkout-form-group textarea:focus {
+            outline: none;
+            border-color: #d4a5a5;
+        }
+
+        .checkout-form-group input[readonly] {
+            background: #f9f9f9;
+            color: #666;
+        }
+
+        .checkout-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .otp-info {
+            color: #666;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .otp-inputs input {
+            width: 50px;
+            height: 55px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .otp-inputs input:focus {
+            outline: none;
+            border-color: #d4a5a5;
+        }
+
+        .resend-otp {
+            text-align: center;
+            margin-top: 15px;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .resend-otp a {
+            color: #d4a5a5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .order-summary {
+            background: #fdf6f6;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .order-summary h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        #summaryItems {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f0e6e6;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item .item-name {
+            color: #555;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .summary-item .item-price {
+            color: #d4a5a5;
+            font-weight: 600;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #d4a5a5;
+            font-size: 1.1rem;
+        }
+
+        .summary-total strong {
+            color: #d4a5a5;
+        }
+
+        .order-success {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .order-success i {
+            font-size: 4rem;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .order-success h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .order-success p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .order-success .order-id {
+            background: #f5f5f5;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 15px 0;
+        }
+
+        .checkout-modal-content .btn-primary {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+        }
+
+        .checkout-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* My Orders Modal Styles */
+        .orders-modal-content {
+            max-width: 600px;
+            max-height: 85vh;
+            padding: 30px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .orders-modal-content h2 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .orders-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .orders-loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .orders-loading i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #d4a5a5;
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .no-orders i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        .order-card {
+            background: #fdf6f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #d4a5a5;
+        }
+
+        .order-card.status-pending {
+            border-left-color: #e8b4b4;
+            background: linear-gradient(135deg, #fdf6f6 0%, #fff5f5 100%);
+        }
+
+        .order-card.status-processing {
+            border-left-color: #c9a0dc;
+            background: linear-gradient(135deg, #faf5fc 0%, #f8f0fa 100%);
+        }
+
+        .order-card.status-completed {
+            border-left-color: #a5d4a5;
+            background: linear-gradient(135deg, #f6fdf6 0%, #f0f9f0 100%);
+        }
+
+        .order-card.status-cancelled {
+            border-left-color: #d4a5a5;
+            background: linear-gradient(135deg, #fdf6f6 0%, #f5eded 100%);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .order-id-date {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .order-id-text {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .order-date {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .order-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .order-status.pending {
+            background: #f5e6e6;
+            color: #c48888;
+        }
+
+        .order-status.processing {
+            background: #f0e6f5;
+            color: #9a6db0;
+        }
+
+        .order-status.completed {
+            background: #e6f5e6;
+            color: #6bb06b;
+        }
+
+        .order-status.cancelled {
+            background: #f5e6e6;
+            color: #b08888;
+        }
+
+        .order-items-list {
+            margin-bottom: 12px;
+        }
+
+        .order-item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 0.85rem;
+            color: #555;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .order-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-name {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .order-item-price {
+            color: #d4a5a5;
+            font-weight: 500;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 2px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .order-total {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .order-total span {
+            color: #d4a5a5;
+            font-size: 1.1rem;
+        }
+
+        .order-address-toggle {
+            background: none;
+            border: none;
+            color: #d4a5a5;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .order-address-toggle:hover {
+            text-decoration: underline;
+        }
+
+        .order-address-details {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(0, 0, 0, 0.1);
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .order-address-details.show {
+            display: block;
+        }
+
+        .order-address-details p {
+            margin: 4px 0;
+        }
+
+        .order-address-details strong {
+            color: #333;
+        }
+
+        @media (max-width: 480px) {
+            .orders-modal-content {
+                padding: 20px;
+                max-height: 90vh;
+            }
+
+            .order-header {
+                flex-direction: column;
+            }
+
+            .order-footer {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
     </style>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script src="script.js"></script>

@@ -12,6 +12,246 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
+
+// ==================== AUTH STATE MANAGEMENT ====================
+auth.onAuthStateChanged((user) => {
+    updateAuthUI(user);
+});
+
+function updateAuthUI(user) {
+    const authLinks = document.getElementById('authLinks');
+    if (!authLinks) return;
+
+    if (user) {
+        // User is logged in
+        const displayName = user.displayName || user.email.split('@')[0];
+        const initials = displayName.charAt(0).toUpperCase();
+
+        authLinks.innerHTML = `
+            <div class="user-dropdown">
+                <button class="user-btn" onclick="toggleDropdown()">
+                    <span class="user-avatar">${initials}</span>
+                    <span>${displayName}</span>
+                    <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+                </button>
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="#"><i class="fas fa-user"></i> My Profile</a>
+                    <a href="#" onclick="openMyOrders(event)"><i class="fas fa-shopping-bag"></i> My Orders</a>
+                    <div class="divider"></div>
+                    <button onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </div>
+        `;
+    } else {
+        // User is logged out
+        authLinks.innerHTML = `
+            <a href="login.html" class="auth-link"><i class="fas fa-user"></i> Login</a>
+        `;
+    }
+}
+
+function toggleDropdown() {
+    const dropdown = document.getElementById('userDropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('active');
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('userDropdown');
+    const userBtn = e.target.closest('.user-btn');
+    if (dropdown && !userBtn) {
+        dropdown.classList.remove('active');
+    }
+});
+
+async function logoutUser() {
+    try {
+        await auth.signOut();
+        window.location.reload();
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+}
+
+// ==================== MY ORDERS ====================
+function openMyOrders(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Close dropdown
+    const dropdown = document.getElementById('userDropdown');
+    if (dropdown) dropdown.classList.remove('active');
+
+    // Open modal
+    const modal = document.getElementById('ordersModal');
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        loadUserOrders();
+    }
+}
+
+function closeOrdersModal() {
+    const modal = document.getElementById('ordersModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+async function loadUserOrders() {
+    const container = document.getElementById('ordersContainer');
+    if (!container) return;
+
+    // Show loading
+    container.innerHTML = `
+        <div class="orders-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading your orders...</p>
+        </div>
+    `;
+
+    try {
+        const user = auth.currentUser;
+        if (!user) {
+            container.innerHTML = `
+                <div class="no-orders">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <p>Please login to view your orders</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Fetch orders for current user (without orderBy to avoid needing composite index)
+        const ordersSnapshot = await db.collection('orders')
+            .where('userId', '==', user.uid)
+            .get();
+
+        if (ordersSnapshot.empty) {
+            container.innerHTML = `
+                <div class="no-orders">
+                    <i class="fas fa-shopping-bag"></i>
+                    <p>You haven't placed any orders yet</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Collect orders and sort by createdAt descending (client-side)
+        let orders = [];
+        ordersSnapshot.forEach(doc => {
+            orders.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Sort by createdAt descending (newest first)
+        orders.sort((a, b) => {
+            const dateA = a.createdAt ? a.createdAt.toDate() : new Date(0);
+            const dateB = b.createdAt ? b.createdAt.toDate() : new Date(0);
+            return dateB - dateA;
+        });
+
+        // Build orders HTML
+        let ordersHTML = '';
+        orders.forEach(order => {
+            ordersHTML += createOrderCardHTML(order.id, order);
+        });
+
+        container.innerHTML = ordersHTML;
+
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        container.innerHTML = `
+            <div class="no-orders">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Error loading orders. Please try again.</p>
+            </div>
+        `;
+    }
+}
+
+function createOrderCardHTML(orderId, order) {
+    const status = order.status || 'pending';
+    const createdAt = order.createdAt ? order.createdAt.toDate() : new Date();
+    const formattedDate = createdAt.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    // Build items list
+    let itemsHTML = '';
+    if (order.items && order.items.length > 0) {
+        order.items.forEach(item => {
+            itemsHTML += `
+                <div class="order-item-row">
+                    <span class="order-item-name">${item.name}</span>
+                    <span class="order-item-price">Rs.${item.price}</span>
+                </div>
+            `;
+        });
+    }
+
+    // Delivery address
+    const addr = order.deliveryAddress || {};
+    const addressHTML = `
+        <p><strong>Name:</strong> ${addr.name || 'N/A'}</p>
+        <p><strong>Phone:</strong> ${addr.phone || 'N/A'}</p>
+        <p><strong>Address:</strong> ${addr.addressLine1 || ''} ${addr.addressLine2 || ''}</p>
+        <p><strong>City:</strong> ${addr.city || 'N/A'} ${addr.postalCode || ''}</p>
+        ${addr.specialInstructions ? `<p><strong>Notes:</strong> ${addr.specialInstructions}</p>` : ''}
+    `;
+
+    return `
+        <div class="order-card status-${status}">
+            <div class="order-header">
+                <div class="order-id-date">
+                    <span class="order-id-text">Order #${orderId.slice(-8).toUpperCase()}</span>
+                    <span class="order-date">${formattedDate}</span>
+                </div>
+                <span class="order-status ${status}">${status}</span>
+            </div>
+            <div class="order-items-list">
+                ${itemsHTML}
+            </div>
+            <div class="order-footer">
+                <div class="order-total">Total: <span>Rs.${order.totalAmount || 0}</span></div>
+                <button class="order-address-toggle" onclick="toggleOrderAddress(this)">
+                    <i class="fas fa-map-marker-alt"></i> View Address
+                </button>
+            </div>
+            <div class="order-address-details">
+                ${addressHTML}
+            </div>
+        </div>
+    `;
+}
+
+function toggleOrderAddress(button) {
+    const addressDiv = button.closest('.order-card').querySelector('.order-address-details');
+    if (addressDiv) {
+        addressDiv.classList.toggle('show');
+        const icon = button.querySelector('i');
+        if (addressDiv.classList.contains('show')) {
+            button.innerHTML = '<i class="fas fa-times"></i> Hide Address';
+        } else {
+            button.innerHTML = '<i class="fas fa-map-marker-alt"></i> View Address';
+        }
+    }
+}
+
+// Close orders modal when clicking outside
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('ordersModal');
+    if (e.target === modal) {
+        closeOrdersModal();
+    }
+});
 
 // ==================== URL CONVERSION ====================
 // Convert Google Drive links to direct image URLs
@@ -439,6 +679,285 @@ function showNotification(message) {
         notification.style.animation = 'slideOutRight 0.3s ease';
         setTimeout(() => notification.remove(), 300);
     }, 2000);
+}
+
+// ==================== CHECKOUT & ORDER FUNCTIONALITY ====================
+let checkoutData = {};
+let confirmationResult = null;
+let recaptchaVerifier = null;
+
+function proceedToCheckout() {
+    const user = auth.currentUser;
+
+    if (!user) {
+        showNotification('Please login to place an order');
+        document.getElementById('cartModal').style.display = 'none';
+        window.location.href = 'login.html';
+        return;
+    }
+
+    if (cart.length === 0) {
+        showNotification('Your cart is empty');
+        return;
+    }
+
+    // Close cart modal and open checkout modal
+    document.getElementById('cartModal').style.display = 'none';
+    document.getElementById('checkoutModal').style.display = 'block';
+
+    // Lock body scroll
+    document.body.style.overflow = 'hidden';
+
+    // Reset to address step
+    document.getElementById('addressStep').style.display = 'block';
+    document.getElementById('successStep').style.display = 'none';
+
+    // Display order summary
+    displayOrderSummary();
+
+    // Pre-fill user data
+    loadUserDataForCheckout(user.uid);
+}
+
+function displayOrderSummary() {
+    const summaryItems = document.getElementById('summaryItems');
+    const summaryTotal = document.getElementById('summaryTotal');
+
+    let total = 0;
+    summaryItems.innerHTML = '';
+
+    cart.forEach(item => {
+        total += item.price;
+        summaryItems.innerHTML += `
+            <div class="summary-item">
+                <span class="item-name">${item.name}</span>
+                <span class="item-price">Rs.${item.price}</span>
+            </div>
+        `;
+    });
+
+    summaryTotal.textContent = total.toFixed(0);
+}
+
+async function loadUserDataForCheckout(userId) {
+    try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            document.getElementById('deliveryName').value = userData.fullName || '';
+            document.getElementById('deliveryPhone').value = userData.phone || '';
+            checkoutData.userPhone = userData.phone;
+            checkoutData.userId = userId;
+            checkoutData.userEmail = userData.email;
+            checkoutData.userName = userData.fullName;
+        }
+    } catch (error) {
+        console.error('Error loading user data:', error);
+    }
+}
+
+function closeCheckoutModal() {
+    document.getElementById('checkoutModal').style.display = 'none';
+    // Restore body scroll
+    document.body.style.overflow = '';
+    // Reset OTP inputs
+    const otpInputs = document.querySelectorAll('#checkoutOtpInputs input');
+    otpInputs.forEach(input => input.value = '');
+}
+
+function showCheckoutError(message) {
+    const errorEl = document.getElementById('checkoutError');
+    errorEl.querySelector('span').textContent = message;
+    errorEl.style.display = 'flex';
+}
+
+function hideCheckoutError() {
+    document.getElementById('checkoutError').style.display = 'none';
+}
+
+// Initialize reCAPTCHA for phone verification
+function initRecaptcha() {
+    if (!recaptchaVerifier) {
+        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('addressForm', {
+            'size': 'invisible',
+            'callback': (response) => {
+                // reCAPTCHA solved
+            }
+        });
+    }
+}
+
+// Address form submission
+document.addEventListener('DOMContentLoaded', function () {
+    const addressForm = document.getElementById('addressForm');
+    if (addressForm) {
+        addressForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            hideCheckoutError();
+
+            // Validate required fields
+            const addressLine1 = document.getElementById('addressLine1').value.trim();
+            const city = document.getElementById('city').value.trim();
+
+            if (!addressLine1 || !city) {
+                showCheckoutError('Please fill in all required fields');
+                return;
+            }
+
+            // Collect address data
+            checkoutData.address = {
+                name: document.getElementById('deliveryName').value,
+                phone: document.getElementById('deliveryPhone').value,
+                addressLine1: addressLine1,
+                addressLine2: document.getElementById('addressLine2').value,
+                city: city,
+                postalCode: document.getElementById('postalCode').value,
+                specialInstructions: document.getElementById('specialInstructions').value
+            };
+
+            const submitBtn = addressForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="checkout-spinner"></span>';
+
+            try {
+                // Create order directly in Firestore
+                const orderId = await createOrder();
+
+                // Show success step
+                document.getElementById('addressStep').style.display = 'none';
+                document.getElementById('successStep').style.display = 'block';
+                document.getElementById('orderId').textContent = orderId;
+
+                // Clear cart
+                cart = [];
+                updateCartCount();
+
+            } catch (error) {
+                console.error('Error placing order:', error);
+                showCheckoutError('Failed to place order. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Confirm & Place Order</span>';
+            }
+        });
+    }
+});
+
+// OTP input navigation
+function moveOtpFocus(input, index) {
+    const inputs = document.querySelectorAll('#checkoutOtpInputs input');
+    if (input.value.length === 1 && index < 5) {
+        inputs[index + 1].focus();
+    }
+}
+
+// Verify OTP and place order
+async function verifyOrderOTP() {
+    const inputs = document.querySelectorAll('#checkoutOtpInputs input');
+    let otp = '';
+    inputs.forEach(input => otp += input.value);
+
+    if (otp.length !== 6) {
+        showCheckoutError('Please enter the complete 6-digit code');
+        return;
+    }
+
+    const verifyBtn = document.querySelector('#otpStep .btn-primary');
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = '<span class="checkout-spinner"></span>';
+    hideCheckoutError();
+
+    try {
+        // Verify OTP
+        await confirmationResult.confirm(otp);
+
+        // Create order in Firestore
+        const orderId = await createOrder();
+
+        // Show success
+        document.getElementById('otpStep').style.display = 'none';
+        document.getElementById('successStep').style.display = 'block';
+        document.getElementById('orderId').textContent = orderId;
+
+        // Clear cart
+        cart = [];
+        updateCartCount();
+
+    } catch (error) {
+        console.error('OTP verification error:', error);
+        showCheckoutError('Invalid verification code. Please try again.');
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = '<span>Verify & Place Order</span>';
+    }
+}
+
+// Create order in Firestore
+async function createOrder() {
+    const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+    const orderData = {
+        // User details
+        userId: checkoutData.userId,
+        userName: checkoutData.userName,
+        userEmail: checkoutData.userEmail,
+        userPhone: checkoutData.userPhone,
+
+        // Delivery address
+        deliveryAddress: {
+            name: checkoutData.address.name,
+            phone: checkoutData.address.phone,
+            addressLine1: checkoutData.address.addressLine1,
+            addressLine2: checkoutData.address.addressLine2,
+            city: checkoutData.address.city,
+            postalCode: checkoutData.address.postalCode,
+            specialInstructions: checkoutData.address.specialInstructions
+        },
+
+        // Order details
+        items: cart.map(item => ({
+            name: item.name,
+            price: item.price
+        })),
+        itemCount: cart.length,
+        totalAmount: total,
+
+        // Order status
+        status: 'pending',
+        paymentStatus: 'pending',
+        paymentMethod: 'cod', // Cash on delivery
+
+        // Timestamps
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    const orderRef = await db.collection('orders').add(orderData);
+    return orderRef.id;
+}
+
+// Resend OTP
+async function resendOrderOTP(e) {
+    e.preventDefault();
+
+    try {
+        // Reset reCAPTCHA
+        if (recaptchaVerifier) {
+            recaptchaVerifier.clear();
+            recaptchaVerifier = null;
+        }
+        initRecaptcha();
+
+        confirmationResult = await auth.signInWithPhoneNumber(checkoutData.userPhone, recaptchaVerifier);
+        showNotification('Verification code resent!');
+
+        // Clear and focus OTP inputs
+        const inputs = document.querySelectorAll('#checkoutOtpInputs input');
+        inputs.forEach(input => input.value = '');
+        inputs[0].focus();
+
+    } catch (error) {
+        console.error('Resend OTP error:', error);
+        showCheckoutError('Failed to resend code. Please try again.');
+    }
 }
 
 // Modal functionality

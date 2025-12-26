@@ -509,7 +509,7 @@
     </style>
 </head>
 
-<body>
+<body style="visibility: hidden;">
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
@@ -661,6 +661,7 @@
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script>
@@ -678,6 +679,38 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Check if user is admin before allowing access
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Verify admin status
+            const isAdmin = await checkIfAdmin(user.email);
+            if (!isAdmin) {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Show the page content once verified
+            document.body.style.visibility = 'visible';
+        });
+
+        async function checkIfAdmin(email) {
+            try {
+                const adminSnapshot = await db.collection('admin')
+                    .where('email', '==', email)
+                    .get();
+                return !adminSnapshot.empty;
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                return false;
+            }
+        }
 
         // Category to emoji mapping
         const categoryEmojis = {

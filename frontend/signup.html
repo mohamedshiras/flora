@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - HKZ Mart</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fdf6f6 0%, #f5e6e6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #d4a5a5 0%, #e8c4c4 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .auth-header .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .auth-header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .auth-form {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #d4a5a5;
+            box-shadow: 0 0 0 4px rgba(212, 165, 165, 0.1);
+        }
+
+        .form-group .input-icon {
+            position: relative;
+        }
+
+        .form-group .input-icon>i:first-child {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            pointer-events: none;
+        }
+
+        .form-group .input-icon input {
+            padding-left: 45px;
+            padding-right: 45px;
+        }
+
+        .phone-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .phone-input-group .country-code {
+            width: 80px;
+            text-align: center;
+            background: #f9f9f9;
+        }
+
+        .phone-input-group input:last-child {
+            flex: 1;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            display: none;
+            z-index: 2;
+        }
+
+        .password-toggle.visible {
+            display: block;
+        }
+
+        .password-toggle:hover {
+            color: #d4a5a5;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #d4a5a5 0%, #c99494 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 165, 165, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #eee;
+        }
+
+        .divider span {
+            padding: 0 15px;
+        }
+
+        .auth-footer {
+            text-align: center;
+            padding: 20px 30px 30px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .auth-footer a {
+            color: #d4a5a5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #ffe6e6;
+            color: #d35050;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .error-message i {
+            font-size: 1.1rem;
+        }
+
+        .success-message {
+            background: #e6ffe6;
+            color: #3a9d3a;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #d4a5a5;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Phone Verification Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .otp-inputs input {
+            width: 50px;
+            height: 55px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .otp-inputs input:focus {
+            outline: none;
+            border-color: #d4a5a5;
+        }
+
+        .resend-link {
+            color: #999;
+            font-size: 0.85rem;
+            margin-top: 15px;
+        }
+
+        .resend-link a {
+            color: #d4a5a5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .resend-link a:hover {
+            text-decoration: underline;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* reCAPTCHA container */
+        #recaptcha-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Store
+    </a>
+
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="logo">HKZ MART</div>
+            <p>Create your account</p>
+        </div>
+
+        <form class="auth-form" id="signupForm">
+            <div class="error-message" id="errorMessage">
+                <i class="fas fa-exclamation-circle"></i>
+                <span></span>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                <span></span>
+            </div>
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <div class="input-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="fullName" placeholder="Enter your full name" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <div class="input-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <div class="phone-input-group">
+                    <input type="text" class="country-code" value="+94" readonly>
+                    <input type="tel" id="phone" placeholder="7X XXX XXXX" required pattern="[0-9]{9,10}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Create a password" required minlength="6"
+                        oninput="showToggle(this)">
+                    <i class="fas fa-eye password-toggle" id="passwordToggle" onclick="togglePassword('password')"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required
+                        oninput="showToggle(this)">
+                    <i class="fas fa-eye password-toggle" id="confirmPasswordToggle"
+                        onclick="togglePassword('confirmPassword')"></i>
+                </div>
+            </div>
+
+            <div id="recaptcha-container"></div>
+
+            <button type="submit" class="btn-primary" id="signupBtn">
+                <span>Create Account</span>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a href="login.html">Login</a>
+        </div>
+    </div>
+
+    <!-- Phone Verification Modal -->
+    <div class="modal" id="otpModal">
+        <div class="modal-content">
+            <h3>Verify Your Phone</h3>
+            <p>We've sent a verification code to <strong id="phoneDisplay"></strong></p>
+            <div class="otp-inputs" id="otpInputs">
+                <input type="text" maxlength="1" oninput="moveToNext(this, 1)">
+                <input type="text" maxlength="1" oninput="moveToNext(this, 2)">
+                <input type="text" maxlength="1" oninput="moveToNext(this, 3)">
+                <input type="text" maxlength="1" oninput="moveToNext(this, 4)">
+                <input type="text" maxlength="1" oninput="moveToNext(this, 5)">
+                <input type="text" maxlength="1" oninput="moveToNext(this, 6)">
+            </div>
+            <button class="btn-primary" id="verifyOtpBtn" onclick="verifyOTP()">
+                <span>Verify & Continue</span>
+            </button>
+            <p class="resend-link">
+                Didn't receive code? <a href="#" id="resendOtp">Resend</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyATGZZIFmo63NoKmREdQmF4_2JJMlm6pQM",
+            authDomain: "flora-de713.firebaseapp.com",
+            projectId: "flora-de713",
+            storageBucket: "flora-de713.firebasestorage.app",
+            messagingSenderId: "993675243646",
+            appId: "1:993675243646:web:57f9c90cc9d9c0251ee82f",
+            measurementId: "G-DNZ03J2EL8"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let confirmationResult = null;
+        let userData = {};
+
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Show/hide password toggle based on input
+        function showToggle(input) {
+            const toggle = input.nextElementSibling;
+            if (input.value.length > 0) {
+                toggle.classList.add('visible');
+            } else {
+                toggle.classList.remove('visible');
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.querySelector('span').textContent = message;
+            errorEl.style.display = 'flex';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            successEl.querySelector('span').textContent = message;
+            successEl.style.display = 'flex';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Hide messages
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // Set button loading state
+        function setLoading(button, loading) {
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = '<div class="spinner"></div>';
+            } else {
+                button.disabled = false;
+                button.innerHTML = '<span>Create Account</span>';
+            }
+        }
+
+        // Handle signup form submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideMessages();
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validation
+            if (!fullName || !email || !phone || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+
+            const signupBtn = document.getElementById('signupBtn');
+            setLoading(signupBtn, true);
+
+            try {
+                // Create user with email and password
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // Update display name
+                await user.updateProfile({
+                    displayName: fullName
+                });
+
+                // Store user data in Firestore
+                await db.collection('users').doc(user.uid).set({
+                    fullName: fullName,
+                    email: email,
+                    phone: '+94' + phone.replace(/^0/, ''),
+                    phoneVerified: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showSuccess('Account created successfully! Redirecting...');
+
+                // Redirect to home page after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+
+            } catch (error) {
+                console.error('Signup error:', error);
+                let errorMessage = 'An error occurred. Please try again.';
+
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'This email is already registered';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Network error. Check your connection';
+                        break;
+                }
+
+                showError(errorMessage);
+                setLoading(signupBtn, false);
+            }
+        });
+
+        // OTP input navigation
+        function moveToNext(input, index) {
+            if (input.value.length === 1 && index < 6) {
+                const inputs = document.querySelectorAll('#otpInputs input');
+                inputs[index].focus();
+            }
+        }
+
+        // Verify OTP (for future phone verification)
+        async function verifyOTP() {
+            const inputs = document.querySelectorAll('#otpInputs input');
+            let otp = '';
+            inputs.forEach(input => otp += input.value);
+
+            if (otp.length !== 6) {
+                showError('Please enter the complete verification code');
+                return;
+            }
+
+            const verifyBtn = document.getElementById('verifyOtpBtn');
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = '<div class="spinner"></div>';
+
+            try {
+                // This will be used for phone verification later
+                if (confirmationResult) {
+                    await confirmationResult.confirm(otp);
+
+                    // Update phone verification status
+                    const user = auth.currentUser;
+                    if (user) {
+                        await db.collection('users').doc(user.uid).update({
+                            phoneVerified: true
+                        });
+                    }
+
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                console.error('OTP verification error:', error);
+                showError('Invalid verification code');
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<span>Verify & Continue</span>';
+            }
+        }
+    </script>
+</body>
+
+</html>
