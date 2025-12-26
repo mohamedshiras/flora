@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Management - HKZ Mart Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fdf6f6 0%, #f5f5f5 100%);
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #d4a5a5 0%, #e8c4c4 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(212, 165, 165, 0.3);
+        }
+
+        .admin-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .admin-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .admin-logo span {
+            color: #333;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .admin-nav a:hover,
+        .admin-nav a.active {
+            opacity: 1;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-user span {
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            background: white;
+            color: #d4a5a5;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #333;
+            color: white;
+        }
+
+        .admin-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .product-admin-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image .placeholder-emoji {
+            font-size: 4rem;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-category {
+            background: #f5e6e6;
+            color: #d4a5a5;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            color: #d4a5a5;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .product-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .availability-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .availability-badge.available {
+            background: #e6f5e6;
+            color: #27ae60;
+        }
+
+        .availability-badge.out {
+            background: #f5e6e6;
+            color: #e74c3c;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .action-btn.edit {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .action-btn.edit:hover {
+            background: #d4a5a5;
+            color: white;
+        }
+
+        .action-btn.toggle {
+            background: #e6f5e6;
+            color: #27ae60;
+        }
+
+        .action-btn.toggle.out {
+            background: #f5e6e6;
+            color: #e74c3c;
+        }
+
+        .action-btn.delete {
+            background: #fff5f5;
+            color: #e74c3c;
+        }
+
+        .action-btn.delete:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+            color: #d4a5a5;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Edit Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #d4a5a5;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .availability-toggle {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e74c3c;
+            transition: 0.4s;
+            border-radius: 30px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background-color: #27ae60;
+        }
+
+        .toggle-switch input:checked+.toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #d4a5a5 0%, #e8c4c4 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(212, 165, 165, 0.4);
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .message.success {
+            background: #e6f5e6;
+            color: #27ae60;
+        }
+
+        .message.error {
+            background: #f5e6e6;
+            color: #e74c3c;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filter-section select {
+            padding: 10px 20px;
+            border: 2px solid #eee;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            background: white;
+        }
+
+        .filter-section select:focus {
+            outline: none;
+            border-color: #d4a5a5;
+        }
+
+        @media (max-width: 768px) {
+            .admin-header .container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .admin-nav {
+                gap: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="admin-header">
+        <div class="container">
+            <div class="admin-logo">HKZ MART <span>Admin</span></div>
+            <nav class="admin-nav">
+                <a href="admin.html">Orders</a>
+                <a href="products-admin.html" class="active">Products</a>
+                <a href="additem.html">Add Product</a>
+            </nav>
+            <div class="admin-user">
+                <span id="adminName">Admin</span>
+                <button class="logout-btn" onclick="logoutAdmin()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-content">
+        <h1 class="page-title">Products Management</h1>
+        <p class="page-subtitle">Manage your product catalog and availability</p>
+
+        <div class="filter-section">
+            <select id="categoryFilter" onchange="filterProducts()">
+                <option value="all">All Categories</option>
+                <option value="scrunchies">Scrunchies</option>
+                <option value="keytags">Keytags</option>
+                <option value="hairclips">Hair Clips</option>
+                <option value="flowerbouquets">Flower Bouquets</option>
+                <option value="flowerpots">Flower Pots</option>
+                <option value="giftboxes">Gift Boxes</option>
+                <option value="chocoboxes">Choco Boxes</option>
+                <option value="chocobouquets">Choco Bouquets</option>
+            </select>
+            <select id="availabilityFilter" onchange="filterProducts()">
+                <option value="all">All Availability</option>
+                <option value="available">In Stock</option>
+                <option value="out">Out of Stock</option>
+            </select>
+        </div>
+
+        <div id="productsLoading" class="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Loading products...</p>
+        </div>
+
+        <div class="products-grid" id="productsGrid" style="display: none;"></div>
+    </main>
+
+    <!-- Edit Product Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Product</h2>
+                <button class="close-modal" onclick="closeEditModal()">&times;</button>
+            </div>
+
+            <div class="message success" id="editSuccess">
+                <i class="fas fa-check-circle"></i>
+                <span>Product updated successfully!</span>
+            </div>
+            <div class="message error" id="editError">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Error updating product</span>
+            </div>
+
+            <form id="editProductForm">
+                <input type="hidden" id="editProductId">
+
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="editName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="editCategory" required>
+                        <option value="scrunchies">Scrunchies</option>
+                        <option value="keytags">Keytags</option>
+                        <option value="hairclips">Hair Clips</option>
+                        <option value="flowerbouquets">Flower Bouquets</option>
+                        <option value="flowerpots">Flower Pots</option>
+                        <option value="giftboxes">Gift Boxes</option>
+                        <option value="chocoboxes">Choco Boxes</option>
+                        <option value="chocobouquets">Choco Bouquets</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editDescription" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Price (Rs.)</label>
+                    <input type="number" id="editPrice" min="0" step="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Availability</label>
+                    <div class="availability-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="editAvailability">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label" id="editAvailabilityLabel">In Stock</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="saveBtn">
+                    <span>Save Changes</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyATGZZIFmo63NoKmREdQmF4_2JJMlm6pQM",
+            authDomain: "flora-de713.firebaseapp.com",
+            projectId: "flora-de713",
+            storageBucket: "flora-de713.firebasestorage.app",
+            messagingSenderId: "993675243646",
+            appId: "1:993675243646:web:57f9c90cc9d9c0251ee82f",
+            measurementId: "G-DNZ03J2EL8"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        let allProducts = [];
+
+        // Auth check
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const isAdmin = await checkIfAdmin(user.email);
+            if (!isAdmin) {
+                window.location.href = '../index.html';
+                return;
+            }
+
+            // Load admin name
+            const adminSnapshot = await db.collection('admin')
+                .where('email', '==', user.email)
+                .get();
+
+            if (!adminSnapshot.empty) {
+                const adminData = adminSnapshot.docs[0].data();
+                document.getElementById('adminName').textContent = adminData.name || 'Admin';
+            }
+
+            loadProducts();
+        });
+
+        async function checkIfAdmin(email) {
+            try {
+                const adminSnapshot = await db.collection('admin')
+                    .where('email', '==', email)
+                    .get();
+                return !adminSnapshot.empty;
+            } catch (error) {
+                console.error('Error checking admin:', error);
+                return false;
+            }
+        }
+
+        async function loadProducts() {
+            const loading = document.getElementById('productsLoading');
+            const grid = document.getElementById('productsGrid');
+
+            try {
+                const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
+                allProducts = [];
+                snapshot.forEach(doc => {
+                    allProducts.push({ id: doc.id, ...doc.data() });
+                });
+
+                loading.style.display = 'none';
+                grid.style.display = 'grid';
+                renderProducts(allProducts);
+
+            } catch (error) {
+                console.error('Error loading products:', error);
+                loading.innerHTML = '<p>Error loading products</p>';
+            }
+        }
+
+        function renderProducts(products) {
+            const grid = document.getElementById('productsGrid');
+
+            if (products.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; padding: 40px; color: #888;">No products found</p>';
+                return;
+            }
+
+            grid.innerHTML = products.map(product => {
+                const imageUrl = convertToDirectUrl(product.imageUrl || (product.imageUrls && product.imageUrls[0]) || '');
+                const isAvailable = product.availability !== false;
+                const emoji = getCategoryEmoji(product.category);
+
+                return `
+                    <div class="product-admin-card">
+                        <div class="product-image">
+                            ${imageUrl ? `<img src="${imageUrl}" alt="${product.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\\'placeholder-emoji\\'>${emoji}</span>';">` : `<span class="placeholder-emoji">${emoji}</span>`}
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">${product.category || 'Products'}</span>
+                            <h3 class="product-name">${product.name}</h3>
+                            <p class="product-price">Rs.${product.price?.toFixed(0) || '0'}</p>
+                            <div class="product-status">
+                                <span class="availability-badge ${isAvailable ? 'available' : 'out'}">
+                                    ${isAvailable ? 'In Stock' : 'Out of Stock'}
+                                </span>
+                                <div class="product-actions">
+                                    <button class="action-btn toggle ${isAvailable ? '' : 'out'}" onclick="toggleAvailability('${product.id}', ${!isAvailable})" title="${isAvailable ? 'Mark Out of Stock' : 'Mark In Stock'}">
+                                        <i class="fas fa-${isAvailable ? 'toggle-on' : 'toggle-off'}"></i>
+                                    </button>
+                                    <button class="action-btn edit" onclick="openEditModal('${product.id}')" title="Edit Product">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete" onclick="deleteProduct('${product.id}')" title="Delete Product">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterProducts() {
+            const category = document.getElementById('categoryFilter').value;
+            const availability = document.getElementById('availabilityFilter').value;
+
+            let filtered = [...allProducts];
+
+            if (category !== 'all') {
+                filtered = filtered.filter(p => (p.category || '').toLowerCase() === category.toLowerCase());
+            }
+
+            if (availability === 'available') {
+                filtered = filtered.filter(p => p.availability !== false);
+            } else if (availability === 'out') {
+                filtered = filtered.filter(p => p.availability === false);
+            }
+
+            renderProducts(filtered);
+        }
+
+        async function toggleAvailability(productId, newAvailability) {
+            try {
+                await db.collection('products').doc(productId).update({
+                    availability: newAvailability
+                });
+
+                // Update local data
+                const product = allProducts.find(p => p.id === productId);
+                if (product) {
+                    product.availability = newAvailability;
+                }
+
+                filterProducts();
+
+            } catch (error) {
+                console.error('Error updating availability:', error);
+                alert('Failed to update availability');
+            }
+        }
+
+        function openEditModal(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            document.getElementById('editProductId').value = productId;
+            document.getElementById('editName').value = product.name || '';
+            document.getElementById('editCategory').value = product.category || 'Scrunchies';
+            document.getElementById('editDescription').value = product.description || '';
+            document.getElementById('editPrice').value = product.price || 0;
+
+            const isAvailable = product.availability !== false;
+            document.getElementById('editAvailability').checked = isAvailable;
+            document.getElementById('editAvailabilityLabel').textContent = isAvailable ? 'In Stock' : 'Out of Stock';
+
+            document.getElementById('editSuccess').style.display = 'none';
+            document.getElementById('editError').style.display = 'none';
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // Availability toggle label update
+        document.getElementById('editAvailability').addEventListener('change', function () {
+            document.getElementById('editAvailabilityLabel').textContent = this.checked ? 'In Stock' : 'Out of Stock';
+        });
+
+        // Edit form submit
+        document.getElementById('editProductForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('saveBtn');
+            const successEl = document.getElementById('editSuccess');
+            const errorEl = document.getElementById('editError');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            successEl.style.display = 'none';
+            errorEl.style.display = 'none';
+
+            try {
+                const productId = document.getElementById('editProductId').value;
+                const updateData = {
+                    name: document.getElementById('editName').value.trim(),
+                    category: document.getElementById('editCategory').value,
+                    description: document.getElementById('editDescription').value.trim(),
+                    price: parseFloat(document.getElementById('editPrice').value),
+                    availability: document.getElementById('editAvailability').checked,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await db.collection('products').doc(productId).update(updateData);
+
+                // Update local data
+                const product = allProducts.find(p => p.id === productId);
+                if (product) {
+                    Object.assign(product, updateData);
+                }
+
+                successEl.style.display = 'flex';
+                filterProducts();
+
+                setTimeout(() => {
+                    closeEditModal();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error updating product:', error);
+                errorEl.style.display = 'flex';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Save Changes</span>';
+            }
+        });
+
+        async function deleteProduct(productId) {
+            if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                await db.collection('products').doc(productId).delete();
+                allProducts = allProducts.filter(p => p.id !== productId);
+                filterProducts();
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                alert('Failed to delete product');
+            }
+        }
+
+        function logoutAdmin() {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        }
+
+        // Close modal on outside click
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target.id === 'editModal') {
+                closeEditModal();
+            }
+        });
+
+        // Utility functions
+        function convertToDirectUrl(url) {
+            if (!url) return url;
+            const driveMatch = url.match(/\/file\/d\/([^\/]+)/);
+            if (driveMatch) {
+                return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+            }
+            return url;
+        }
+
+        function getCategoryEmoji(category) {
+            const emojis = {
+                'Scrunchies': '🎀',
+                'Keytags': '🔑',
+                'Hair Clips': '💇‍♀️',
+                'Flower Bouquets': '💐',
+                'Flower Pots': '🪴',
+                'Gift Boxes': '🎁',
+                'Choco Boxes': '🍫',
+                'Choco Bouquets': '🍬'
+            };
+            return emojis[category] || '🎁';
+        }
+    </script>
+</body>
+
+</html>

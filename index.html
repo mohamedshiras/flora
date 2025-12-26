@@ -7,6 +7,8 @@
     <title>HKZ Mart - Handmade Gifts & Accessories</title>
     <link rel="stylesheet" href="frontend/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 
 <body>
@@ -17,8 +19,7 @@
                 <div class="nav-links">
                     <a href="#home">HOME</a>
                     <a href="#products">PRODUCTS</a>
-                    <a href="#about">ABOUT</a>
-                    <a href="#contact">CONTACT</a>
+                    <a href="#footer">CONTACT</a>
                 </div>
                 <div class="logo">HKZ MART</div>
                 <div class="nav-right">
@@ -105,7 +106,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" id="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-col">
@@ -261,7 +262,7 @@
                             <span class="detail-value price" id="modalPrice">Rs.0</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Stock:</span>
+                            <span class="detail-label">Availability:</span>
                             <span class="detail-value" id="modalStock">Available</span>
                         </div>
                     </div>
@@ -289,6 +290,85 @@
                     <i class="fas fa-spinner fa-spin"></i>
                     <p>Loading your orders...</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content profile-modal-content">
+            <span class="close" onclick="closeProfileModal()">&times;</span>
+            <h2>My Profile</h2>
+
+            <div class="profile-section">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <div class="profile-info">
+                    <h3 id="profileName">User Name</h3>
+                    <p id="profileEmail">email@example.com</p>
+                </div>
+            </div>
+
+            <div class="profile-details">
+                <div class="profile-detail-row">
+                    <span class="detail-label"><i class="fas fa-phone"></i> Phone:</span>
+                    <span class="detail-value" id="profilePhone">Not set</span>
+                </div>
+                <div class="profile-detail-row">
+                    <span class="detail-label"><i class="fas fa-calendar"></i> Member since:</span>
+                    <span class="detail-value" id="profileJoined">-</span>
+                </div>
+            </div>
+
+            <div class="profile-divider"></div>
+
+            <div class="change-password-section">
+                <h3><i class="fas fa-lock"></i> Change Password</h3>
+
+                <div class="password-message success" id="passwordSuccess" style="display: none;">
+                    <i class="fas fa-check-circle"></i>
+                    <span></span>
+                </div>
+                <div class="password-message error" id="passwordError" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span></span>
+                </div>
+
+                <form id="changePasswordForm">
+                    <div class="profile-form-group">
+                        <label>Current Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="currentPassword" placeholder="Enter current password" required>
+                            <button type="button" class="toggle-password"
+                                onclick="togglePasswordVisibility('currentPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="profile-form-group">
+                        <label>New Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="newPassword" placeholder="Enter new password" required
+                                minlength="6">
+                            <button type="button" class="toggle-password"
+                                onclick="togglePasswordVisibility('newPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="profile-form-group">
+                        <label>Confirm New Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+                            <button type="button" class="toggle-password"
+                                onclick="togglePasswordVisibility('confirmPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" id="changePasswordBtn">
+                        <span>Update Password</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -764,6 +844,184 @@
             to {
                 transform: rotate(360deg);
             }
+        }
+
+        /* My Profile Modal Styles */
+        .profile-modal-content {
+            max-width: 500px;
+            max-height: 90vh;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .profile-modal-content h2 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fdf6f6 0%, #f5e6e6 100%);
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .profile-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d4a5a5 0%, #e8c4c4 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .profile-info h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .profile-details {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+        }
+
+        .profile-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .profile-detail-row:not(:last-child) {
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-detail-row .detail-label {
+            color: #666;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-detail-row .detail-label i {
+            color: #d4a5a5;
+            width: 16px;
+        }
+
+        .profile-detail-row .detail-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .profile-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #d4a5a5, transparent);
+            margin: 25px 0;
+        }
+
+        .change-password-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .change-password-section h3 i {
+            color: #d4a5a5;
+        }
+
+        .password-message {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .password-message.success {
+            background: #e6f5e6;
+            color: #3c763d;
+        }
+
+        .password-message.error {
+            background: #f5e6e6;
+            color: #a94442;
+        }
+
+        .profile-form-group {
+            margin-bottom: 18px;
+        }
+
+        .profile-form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .password-input-wrapper {
+            position: relative;
+        }
+
+        .password-input-wrapper input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .password-input-wrapper input:focus {
+            outline: none;
+            border-color: #d4a5a5;
+        }
+
+        .password-input-wrapper .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .password-input-wrapper .toggle-password:hover {
+            color: #d4a5a5;
+        }
+
+        .profile-modal-content .btn-primary {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
         }
 
         /* My Orders Modal Styles */

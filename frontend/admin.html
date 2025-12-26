@@ -16,15 +16,15 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #fdf6f6 0%, #f5f5f5 100%);
             min-height: 100vh;
         }
 
         .admin-header {
-            background: linear-gradient(135deg, #333 0%, #555 100%);
+            background: linear-gradient(135deg, #d4a5a5 0%, #e8c4c4 100%);
             color: white;
             padding: 20px 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(212, 165, 165, 0.3);
         }
 
         .admin-header .container {
@@ -44,7 +44,7 @@
         }
 
         .admin-logo span {
-            color: #d4a5a5;
+            color: #333;
         }
 
         .admin-nav {
@@ -77,18 +77,20 @@
         }
 
         .logout-btn {
-            background: #d4a5a5;
-            color: white;
+            background: white;
+            color: #d4a5a5;
             border: none;
             padding: 8px 20px;
             border-radius: 20px;
             cursor: pointer;
             font-size: 0.85rem;
-            transition: background 0.3s;
+            font-weight: 500;
+            transition: all 0.3s;
         }
 
         .logout-btn:hover {
-            background: #c99494;
+            background: #333;
+            color: white;
         }
 
         .admin-content {
@@ -531,8 +533,8 @@
             <div class="admin-logo">HKZ MART <span>Admin</span></div>
             <nav class="admin-nav">
                 <a href="admin.html" class="active">Orders</a>
+                <a href="products-admin.html">Products</a>
                 <a href="additem.html">Add Product</a>
-                <a href="../index.html">View Store</a>
             </nav>
             <div class="admin-user">
                 <span id="adminName">Admin</span>

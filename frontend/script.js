@@ -36,7 +36,7 @@ function updateAuthUI(user) {
                     <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
                 </button>
                 <div class="dropdown-menu" id="userDropdown">
-                    <a href="#"><i class="fas fa-user"></i> My Profile</a>
+                    <a href="#" onclick="openMyProfile(event)"><i class="fas fa-user"></i> My Profile</a>
                     <a href="#" onclick="openMyOrders(event)"><i class="fas fa-shopping-bag"></i> My Orders</a>
                     <div class="divider"></div>
                     <button onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -253,6 +253,171 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// ==================== MY PROFILE ====================
+function openMyProfile(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Close dropdown
+    const dropdown = document.getElementById('userDropdown');
+    if (dropdown) dropdown.classList.remove('active');
+
+    // Open modal
+    const modal = document.getElementById('profileModal');
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        loadProfileData();
+    }
+}
+
+function closeProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        // Clear form
+        document.getElementById('changePasswordForm').reset();
+        document.getElementById('passwordSuccess').style.display = 'none';
+        document.getElementById('passwordError').style.display = 'none';
+    }
+}
+
+async function loadProfileData() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    // Set avatar
+    const displayName = user.displayName || user.email.split('@')[0];
+    const initials = displayName.charAt(0).toUpperCase();
+    document.getElementById('profileAvatar').textContent = initials;
+    document.getElementById('profileName').textContent = displayName;
+    document.getElementById('profileEmail').textContent = user.email;
+
+    // Fetch additional data from Firestore
+    try {
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            document.getElementById('profilePhone').textContent = userData.phone || 'Not set';
+
+            if (userData.createdAt) {
+                const joinDate = userData.createdAt.toDate();
+                document.getElementById('profileJoined').textContent = joinDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+    }
+}
+
+function togglePasswordVisibility(inputId, button) {
+    const input = document.getElementById(inputId);
+    const icon = button.querySelector('i');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+// Change Password Form Handler
+document.addEventListener('DOMContentLoaded', () => {
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', handleChangePassword);
+    }
+});
+
+async function handleChangePassword(e) {
+    e.preventDefault();
+
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const btn = document.getElementById('changePasswordBtn');
+    const successEl = document.getElementById('passwordSuccess');
+    const errorEl = document.getElementById('passwordError');
+
+    // Hide previous messages
+    successEl.style.display = 'none';
+    errorEl.style.display = 'none';
+
+    // Validate passwords match
+    if (newPassword !== confirmPassword) {
+        errorEl.querySelector('span').textContent = 'New passwords do not match';
+        errorEl.style.display = 'flex';
+        return;
+    }
+
+    // Validate password length
+    if (newPassword.length < 6) {
+        errorEl.querySelector('span').textContent = 'Password must be at least 6 characters';
+        errorEl.style.display = 'flex';
+        return;
+    }
+
+    // Show loading
+    btn.disabled = true;
+    btn.innerHTML = '<span class="checkout-spinner"></span>';
+
+    try {
+        const user = auth.currentUser;
+
+        // Re-authenticate user first
+        const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+        await user.reauthenticateWithCredential(credential);
+
+        // Update password
+        await user.updatePassword(newPassword);
+
+        successEl.querySelector('span').textContent = 'Password updated successfully!';
+        successEl.style.display = 'flex';
+
+        // Clear form
+        document.getElementById('changePasswordForm').reset();
+
+    } catch (error) {
+        console.error('Password change error:', error);
+        let errorMessage = 'Failed to update password';
+
+        switch (error.code) {
+            case 'auth/wrong-password':
+                errorMessage = 'Current password is incorrect';
+                break;
+            case 'auth/weak-password':
+                errorMessage = 'New password is too weak';
+                break;
+            case 'auth/requires-recent-login':
+                errorMessage = 'Please logout and login again before changing password';
+                break;
+        }
+
+        errorEl.querySelector('span').textContent = errorMessage;
+        errorEl.style.display = 'flex';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Update Password</span>';
+    }
+}
+
+// Close profile modal when clicking outside
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('profileModal');
+    if (e.target === modal) {
+        closeProfileModal();
+    }
+});
+
 // ==================== URL CONVERSION ====================
 // Convert Google Drive links to direct image URLs
 function convertToDirectUrl(url) {
@@ -417,7 +582,8 @@ function createProductCard(product) {
     const multiImageBadge = hasMultipleImages ? `<span class="multi-image-badge"><i class="fas fa-images"></i> ${product.imageUrls.length}</span>` : '';
 
     return `
-        <div class="product-card" data-id="${product.id}" onclick="openProductModal('${product.id}')">
+        <div class="product-card ${product.availability === false ? 'out-of-stock' : ''}" data-id="${product.id}" onclick="openProductModal('${product.id}')">
+            ${product.availability === false ? '<div class="out-of-stock-banner">Out of Stock</div>' : ''}
             <div class="product-image">
                 ${imageHtml}
                 ${badgeHtml}
@@ -430,11 +596,10 @@ function createProductCard(product) {
                 ${colorsHtml}
                 <div class="product-footer">
                     <span class="price">Rs.${product.price?.toFixed(0) || '0'}</span>
-                    <button class="add-to-cart" 
-                        onclick="event.stopPropagation(); addToCart('${product.name.replace(/'/g, "\\'")}', ${product.price})"
-                        ${product.quantity === 0 ? 'disabled' : ''}>
-                        ${product.quantity === 0 ? 'Sold Out' : 'Add to Cart'}
-                    </button>
+                    ${product.availability === false ? '' : `<button class="add-to-cart" 
+                        onclick="event.stopPropagation(); addToCart('${product.name.replace(/'/g, "\\'")}', ${product.price}, '${(product.imageUrls && product.imageUrls[0]) || product.imageUrl || ''}')">
+                        Add to Cart
+                    </button>`}
                 </div>
             </div>
         </div>
@@ -516,14 +681,11 @@ function openProductModal(productId) {
 
     // Stock status
     const stockEl = document.getElementById('modalStock');
-    if (product.quantity === 0) {
+    if (product.availability === false) {
         stockEl.textContent = 'Out of Stock';
         stockEl.style.color = '#e74c3c';
-    } else if (product.quantity <= 5) {
-        stockEl.textContent = `Low Stock (${product.quantity} left)`;
-        stockEl.style.color = '#e67e22';
     } else {
-        stockEl.textContent = `Available (${product.quantity} in stock)`;
+        stockEl.textContent = 'Available';
         stockEl.style.color = '#27ae60';
     }
 
@@ -570,14 +732,23 @@ function openProductModal(productId) {
 
     // Add to cart button
     const addBtn = document.getElementById('modalAddToCart');
+    const productImageUrl = (product.imageUrls && product.imageUrls[0]) || product.imageUrl || '';
     addBtn.onclick = function () {
         const colorInfo = selectedColor ? ` (${selectedColor.name})` : '';
-        addToCart(product.name + colorInfo, product.price);
+        addToCart(product.name + colorInfo, product.price, productImageUrl);
     };
-    addBtn.disabled = product.quantity === 0;
-    addBtn.innerHTML = product.quantity === 0
-        ? '<i class="fas fa-times"></i> Out of Stock'
-        : '<i class="fas fa-shopping-cart"></i> Add to Cart';
+
+    if (product.availability === false) {
+        addBtn.disabled = true;
+        addBtn.innerHTML = '<i class="fas fa-times"></i> Out of Stock';
+        addBtn.style.opacity = '0.5';
+        addBtn.style.cursor = 'not-allowed';
+    } else {
+        addBtn.disabled = false;
+        addBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
+        addBtn.style.opacity = '1';
+        addBtn.style.cursor = 'pointer';
+    }
 
     // Show modal
     modal.style.display = 'block';
@@ -648,8 +819,8 @@ document.addEventListener('DOMContentLoaded', initProductsDisplay);
 // Cart functionality
 let cart = [];
 
-function addToCart(name, price) {
-    cart.push({ name, price });
+function addToCart(name, price, imageUrl = '') {
+    cart.push({ name, price, imageUrl });
     updateCartCount();
     showNotification(`${name} added to cart!`);
 }
@@ -685,6 +856,11 @@ function showNotification(message) {
 let checkoutData = {};
 let confirmationResult = null;
 let recaptchaVerifier = null;
+
+// Initialize EmailJS
+(function () {
+    emailjs.init('P8m8m9AWH-GOz_BYL');
+})();
 
 function proceedToCheckout() {
     const user = auth.currentUser;
@@ -915,7 +1091,8 @@ async function createOrder() {
         // Order details
         items: cart.map(item => ({
             name: item.name,
-            price: item.price
+            price: item.price,
+            imageUrl: item.imageUrl || ''
         })),
         itemCount: cart.length,
         totalAmount: total,
@@ -931,7 +1108,71 @@ async function createOrder() {
     };
 
     const orderRef = await db.collection('orders').add(orderData);
+
+    // Send confirmation email
+    await sendOrderConfirmationEmail(orderRef.id, orderData);
+
     return orderRef.id;
+}
+
+// Send order confirmation email via EmailJS
+async function sendOrderConfirmationEmail(orderId, orderData) {
+    try {
+        // Build items HTML for email with images
+        const itemsHtml = orderData.items.map(item => {
+            const imageUrl = convertToDirectUrl(item.imageUrl) || 'https://via.placeholder.com/64x64?text=Product';
+            return `<tr style="vertical-align: top;">
+                <td style="padding: 16px 8px 0 0; width: 64px;">
+                    <img style="height: 64px; width: 64px; object-fit: cover; border-radius: 8px;" height="64" width="64" src="${imageUrl}" alt="${item.name}" />
+                </td>
+                <td style="padding: 16px 8px 0 8px; width: 100%;">
+                    <div style="font-weight: 500;">${item.name}</div>
+                    <div style="font-size: 13px; color: #888; padding-top: 4px;">QTY: 1</div>
+                </td>
+                <td style="padding: 16px 0 0 0; white-space: nowrap; text-align: right;">
+                    <strong>Rs.${item.price.toFixed(0)}</strong>
+                </td>
+            </tr>`;
+        }).join('');
+
+        // Format the address
+        const fullAddress = [
+            orderData.deliveryAddress.addressLine1,
+            orderData.deliveryAddress.addressLine2,
+            orderData.deliveryAddress.city,
+            orderData.deliveryAddress.postalCode
+        ].filter(Boolean).join(', ');
+
+        // Get current date
+        const orderDate = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const templateParams = {
+            to_email: orderData.userEmail,
+            to_name: orderData.userName,
+            order_id: orderId,
+            order_date: orderDate,
+            items_html: itemsHtml,
+            item_count: orderData.itemCount,
+            total_amount: orderData.totalAmount.toFixed(0),
+            delivery_name: orderData.deliveryAddress.name,
+            delivery_phone: orderData.deliveryAddress.phone,
+            delivery_address: fullAddress,
+            special_instructions: orderData.deliveryAddress.specialInstructions || 'None'
+        };
+
+        await emailjs.send('service_6edy7kd', 'template_jud1zul', templateParams);
+        console.log('Order confirmation email sent successfully to:', orderData.userEmail);
+    } catch (error) {
+        console.error('Failed to send confirmation email:', error);
+        console.error('Email params:', { to_email: orderData.userEmail, to_name: orderData.userName });
+        // Don't throw error - order is still placed even if email fails
+    }
 }
 
 // Resend OTP
