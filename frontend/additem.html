@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Item - HKZ Mart</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Add Item Page Specific Styles */
+        .add-item-section {
+            min-height: calc(100vh - 80px);
+            background: linear-gradient(135deg, #fdf6f6 0%, #f5e6e6 100%);
+            padding: 60px 0;
+        }
+
+        .add-item-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .add-item-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(212, 165, 165, 0.2);
+            padding: 50px;
+        }
+
+        /* Preview Card Styles */
+        .preview-section {
+            position: sticky;
+            top: 100px;
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .preview-header p {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(212, 165, 165, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .preview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .preview-image {
+            height: 250px;
+            background: linear-gradient(135deg, #fdf6f6 0%, #f5e6e6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-image .placeholder-emoji {
+            font-size: 5rem;
+        }
+
+        .preview-image-gallery {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            background: #f9f9f9;
+            overflow-x: auto;
+        }
+
+        .preview-image-gallery img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .preview-image-gallery img:hover,
+        .preview-image-gallery img.active {
+            border-color: #d4a5a5;
+        }
+
+        .preview-info {
+            padding: 25px;
+        }
+
+        .preview-category {
+            display: inline-block;
+            background: #f5e6e6;
+            color: #d4a5a5;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .preview-info h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .preview-info .description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .preview-colors {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .preview-color {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #eee;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .preview-color:hover {
+            transform: scale(1.1);
+            border-color: #d4a5a5;
+        }
+
+        .preview-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #f0e6e6;
+        }
+
+        .preview-price {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #d4a5a5;
+        }
+
+        .preview-stock {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .preview-stock.low {
+            color: #e67e22;
+        }
+
+        .preview-stock.out {
+            color: #e74c3c;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        .form-header .icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group label .required {
+            color: #d4a5a5;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #f0e6e6;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #fdfafa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #d4a5a5;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(212, 165, 165, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #d4a5a5 0%, #c99393 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #c99393 0%, #b88282 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 165, 165, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit i {
+            margin-right: 10px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #d4a5a5;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+
+        /* Multiple Images Input */
+        .images-input-container {
+            border: 2px dashed #f0e6e6;
+            border-radius: 10px;
+            padding: 20px;
+            background: #fdfafa;
+            transition: all 0.3s ease;
+        }
+
+        .images-input-container:hover {
+            border-color: #d4a5a5;
+        }
+
+        .images-input-container .url-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .image-url-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .image-url-row input {
+            flex: 1;
+        }
+
+        .image-url-row .remove-url {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .image-url-row .remove-url:hover {
+            background: #ee5253;
+        }
+
+        .add-image-btn {
+            margin-top: 15px;
+            background: #f5e6e6;
+            color: #d4a5a5;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-image-btn:hover {
+            background: #d4a5a5;
+            color: white;
+        }
+
+        /* Colors Input */
+        .colors-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .color-input-wrapper input[type="color"] {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .color-input-wrapper input[type="text"] {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+
+        .color-input-wrapper .remove-color {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-color-btn {
+            background: #f5e6e6;
+            color: #d4a5a5;
+            border: 2px dashed #d4a5a5;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .add-color-btn:hover {
+            background: #d4a5a5;
+            color: white;
+            border-style: solid;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .add-item-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-section {
+                position: relative;
+                top: 0;
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .add-item-container {
+                margin: 0 20px;
+                padding: 30px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="nav-links">
+                    <a href="index.html">HOME</a>
+                    <a href="index.html#products">PRODUCTS</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#contact">CONTACT</a>
+                </div>
+                <div class="logo">HKZ MART</div>
+                <div class="nav-right">
+                    <a href="index.html" class="cart-btn">
+                        <i class="fas fa-home"></i> BACK TO SHOP
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Add Item Section -->
+    <section class="add-item-section">
+        <div class="container">
+            <div class="add-item-wrapper">
+                <!-- Form Container -->
+                <div class="add-item-container">
+                    <a href="index.html" class="back-link">
+                        <i class="fas fa-arrow-left"></i> Back to Shop
+                    </a>
+
+                    <div class="form-header">
+                        <div class="icon">🎁</div>
+                        <h1>Add New Item</h1>
+                        <p>Add a beautiful product to your collection</p>
+                    </div>
+
+                    <div id="successMessage" class="success-message">
+                        <i class="fas fa-check-circle"></i> Item added successfully!
+                    </div>
+
+                    <div id="errorMessage" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i> Error adding item. Please try again.
+                    </div>
+
+                    <form id="addItemForm">
+                        <div class="form-group">
+                            <label for="itemName">Item Name <span class="required">*</span></label>
+                            <input type="text" id="itemName" name="itemName" placeholder="e.g., Velvet Scrunchie Set"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category">Category <span class="required">*</span></label>
+                            <select id="category" name="category" required>
+                                <option value="">Select a category</option>
+                                <option value="scrunchies">Scrunchies</option>
+                                <option value="keytags">Keytags</option>
+                                <option value="hairclips">Fancy Hair Clips</option>
+                                <option value="flowerbouquets">Flower Bouquets</option>
+                                <option value="flowerpots">Flower Pots</option>
+                                <option value="giftboxes">Customized Gift Boxes</option>
+                                <option value="chocoboxes">Customized Choco Boxes</option>
+                                <option value="chocobouquets">Customized Choco Bouquets</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description <span class="required">*</span></label>
+                            <textarea id="description" name="description" placeholder="Describe your product..."
+                                required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="price">Price (Rs.) <span class="required">*</span></label>
+                                <input type="number" id="price" name="price" placeholder="180" step="1" min="0"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="quantity">Quantity <span class="required">*</span></label>
+                                <input type="number" id="quantity" name="quantity" placeholder="10" min="0" required>
+                            </div>
+                        </div>
+
+                        <!-- Multiple Images Input -->
+                        <div class="form-group">
+                            <label>Product Images (optional)</label>
+                            <div class="images-input-container">
+                                <p style="font-size: 12px; color: #888; margin-bottom: 10px;">💡 You can paste Google
+                                    Drive share links - they'll be converted automatically!</p>
+                                <div class="url-inputs" id="imageUrlInputs">
+                                    <div class="image-url-row">
+                                        <input type="url" name="imageUrls[]"
+                                            placeholder="Paste Google Drive or image URL"
+                                            oninput="updatePreviewImages()" onpaste="handleImageUrlPaste(this)">
+                                        <button type="button" class="remove-url" onclick="removeImageInput(this)"
+                                            style="display:none;">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" class="add-image-btn" onclick="addImageInput()">
+                                    <i class="fas fa-plus"></i> Add Another Image
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Colors Input -->
+                        <div class="form-group">
+                            <label>Available Colors (optional)</label>
+                            <div class="colors-input-container" id="colorsContainer">
+                                <div class="color-input-wrapper">
+                                    <input type="color" value="#d4a5a5" onchange="updatePreviewColors()">
+                                    <input type="text" placeholder="Color name" value="Pink"
+                                        onchange="updatePreviewColors()">
+                                    <button type="button" class="remove-color" onclick="removeColor(this)"
+                                        style="display:none;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <button type="button" class="add-color-btn" onclick="addColorInput()">
+                                    <i class="fas fa-plus"></i> Add Color
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-plus"></i> Add Item
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="preview-section">
+                    <div class="preview-header">
+                        <h3>Live Preview</h3>
+                        <p>See how your product will look</p>
+                    </div>
+                    <div class="preview-card">
+                        <div class="preview-image" id="previewMainImage">
+                            <span class="placeholder-emoji">🎁</span>
+                        </div>
+                        <div class="preview-image-gallery" id="previewGallery" style="display: none;"></div>
+                        <div class="preview-info">
+                            <span class="preview-category" id="previewCategory">Category</span>
+                            <h4 id="previewName">Product Name</h4>
+                            <p class="description" id="previewDescription">Product description will appear here...</p>
+                            <div class="preview-colors" id="previewColors">
+                                <div class="preview-color" style="background: #d4a5a5;" title="Pink"></div>
+                            </div>
+                            <div class="preview-footer">
+                                <span class="preview-price" id="previewPrice">Rs.0</span>
+                                <span class="preview-stock" id="previewStock">In Stock</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyATGZZIFmo63NoKmREdQmF4_2JJMlm6pQM",
+            authDomain: "flora-de713.firebaseapp.com",
+            projectId: "flora-de713",
+            storageBucket: "flora-de713.firebasestorage.app",
+            messagingSenderId: "993675243646",
+            appId: "1:993675243646:web:57f9c90cc9d9c0251ee82f",
+            measurementId: "G-DNZ03J2EL8"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Category to emoji mapping
+        const categoryEmojis = {
+            'scrunchies': '🎀',
+            'keytags': '🔑',
+            'hairclips': '💇',
+            'flowerbouquets': '💐',
+            'flowerpots': '🌸',
+            'giftboxes': '🎁',
+            'chocoboxes': '🍫',
+            'chocobouquets': '🍬',
+            'default': '🎁'
+        };
+
+        // ==================== IMAGE INPUT FUNCTIONS ====================
+
+        // Convert Google Drive links to direct image URLs
+        function convertToDirectUrl(url) {
+            if (!url) return url;
+
+            // Google Drive file link: https://drive.google.com/file/d/FILE_ID/view
+            const driveFileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (driveFileMatch) {
+                const fileId = driveFileMatch[1];
+                // Use lh3.googleusercontent.com which is more reliable
+                return `https://lh3.googleusercontent.com/d/${fileId}`;
+            }
+
+            // Google Drive open link: https://drive.google.com/open?id=FILE_ID
+            const driveOpenMatch = url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+            if (driveOpenMatch) {
+                const fileId = driveOpenMatch[1];
+                return `https://lh3.googleusercontent.com/d/${fileId}`;
+            }
+
+            // Already a direct URL or other format
+            return url;
+        }
+
+        // Handle paste event to auto-convert Google Drive links
+        function handleImageUrlPaste(input) {
+            setTimeout(() => {
+                const converted = convertToDirectUrl(input.value);
+                if (converted !== input.value) {
+                    input.value = converted;
+                    showConversionNotice();
+                }
+                updatePreviewImages();
+            }, 100);
+        }
+
+        function showConversionNotice() {
+            // Show a brief notification that link was converted
+            const notice = document.createElement('div');
+            notice.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: #27ae60;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            notice.innerHTML = '<i class="fas fa-check"></i> Google Drive link converted!';
+            document.body.appendChild(notice);
+            setTimeout(() => notice.remove(), 2000);
+        }
+
+        function addImageInput() {
+            const container = document.getElementById('imageUrlInputs');
+            const rows = container.querySelectorAll('.image-url-row');
+
+            // Show remove buttons on existing rows
+            rows.forEach(row => {
+                row.querySelector('.remove-url').style.display = 'flex';
+            });
+
+            const newRow = document.createElement('div');
+            newRow.className = 'image-url-row';
+            newRow.innerHTML = `
+                <input type="url" name="imageUrls[]" placeholder="Paste Google Drive or image URL" oninput="updatePreviewImages()" onpaste="handleImageUrlPaste(this)">
+                <button type="button" class="remove-url" onclick="removeImageInput(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        function removeImageInput(btn) {
+            const container = document.getElementById('imageUrlInputs');
+            btn.closest('.image-url-row').remove();
+
+            const rows = container.querySelectorAll('.image-url-row');
+            if (rows.length === 1) {
+                rows[0].querySelector('.remove-url').style.display = 'none';
+            }
+            updatePreviewImages();
+        }
+
+        // ==================== COLOR INPUT FUNCTIONS ====================
+        function addColorInput() {
+            const container = document.getElementById('colorsContainer');
+            const addBtn = container.querySelector('.add-color-btn');
+            const wrappers = container.querySelectorAll('.color-input-wrapper');
+
+            // Show remove buttons on existing wrappers
+            wrappers.forEach(wrapper => {
+                wrapper.querySelector('.remove-color').style.display = 'flex';
+            });
+
+            const newWrapper = document.createElement('div');
+            newWrapper.className = 'color-input-wrapper';
+            newWrapper.innerHTML = `
+                <input type="color" value="#6c5ce7" onchange="updatePreviewColors()">
+                <input type="text" placeholder="Color name" onchange="updatePreviewColors()">
+                <button type="button" class="remove-color" onclick="removeColor(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.insertBefore(newWrapper, addBtn);
+            updatePreviewColors();
+        }
+
+        function removeColor(btn) {
+            const container = document.getElementById('colorsContainer');
+            btn.closest('.color-input-wrapper').remove();
+
+            const wrappers = container.querySelectorAll('.color-input-wrapper');
+            if (wrappers.length === 1) {
+                wrappers[0].querySelector('.remove-color').style.display = 'none';
+            }
+            updatePreviewColors();
+        }
+
+        // ==================== LIVE PREVIEW FUNCTIONS ====================
+        function updatePreview() {
+            const name = document.getElementById('itemName').value || 'Product Name';
+            const category = document.getElementById('category').value || 'Category';
+            const description = document.getElementById('description').value || 'Product description will appear here...';
+            const price = document.getElementById('price').value || '0';
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+
+            document.getElementById('previewName').textContent = name;
+            document.getElementById('previewCategory').textContent = category;
+            document.getElementById('previewDescription').textContent = description;
+            document.getElementById('previewPrice').textContent = `Rs.${price}`;
+
+            // Update stock status
+            const stockEl = document.getElementById('previewStock');
+            if (quantity === 0) {
+                stockEl.textContent = 'Out of Stock';
+                stockEl.className = 'preview-stock out';
+            } else if (quantity <= 5) {
+                stockEl.textContent = `Low Stock (${quantity})`;
+                stockEl.className = 'preview-stock low';
+            } else {
+                stockEl.textContent = `In Stock (${quantity})`;
+                stockEl.className = 'preview-stock';
+            }
+
+            // Update emoji based on category
+            const emoji = categoryEmojis[category] || categoryEmojis['default'];
+            const mainImage = document.getElementById('previewMainImage');
+            if (!mainImage.querySelector('img')) {
+                mainImage.innerHTML = `<span class="placeholder-emoji">${emoji}</span>`;
+            }
+        }
+
+        function updatePreviewImages() {
+            const inputs = document.querySelectorAll('input[name="imageUrls[]"]');
+            const urls = Array.from(inputs).map(input => input.value.trim()).filter(url => url);
+
+            const mainImage = document.getElementById('previewMainImage');
+            const gallery = document.getElementById('previewGallery');
+
+            // Convert all URLs
+            const convertedUrls = urls.map(url => convertToDirectUrl(url));
+
+            if (convertedUrls.length > 0) {
+                mainImage.innerHTML = `<img src="${convertedUrls[0]}" alt="Product" onerror="this.parentElement.innerHTML='<span class=\\'placeholder-emoji\\'>🎁</span>'">`;
+
+                if (convertedUrls.length > 1) {
+                    gallery.style.display = 'flex';
+                    gallery.innerHTML = convertedUrls.map((url, index) =>
+                        `<img src="${url}" alt="Product ${index + 1}" class="${index === 0 ? 'active' : ''}" onclick="setMainPreviewImage('${url}', this)">`
+                    ).join('');
+                } else {
+                    gallery.style.display = 'none';
+                }
+            } else {
+                const category = document.getElementById('category').value;
+                const emoji = categoryEmojis[category] || categoryEmojis['default'];
+                mainImage.innerHTML = `<span class="placeholder-emoji">${emoji}</span>`;
+                gallery.style.display = 'none';
+            }
+        }
+
+        function setMainPreviewImage(url, thumbEl) {
+            const mainImage = document.getElementById('previewMainImage');
+            mainImage.innerHTML = `<img src="${url}" alt="Product">`;
+
+            // Update active state
+            document.querySelectorAll('#previewGallery img').forEach(img => img.classList.remove('active'));
+            thumbEl.classList.add('active');
+        }
+
+        function updatePreviewColors() {
+            const wrappers = document.querySelectorAll('#colorsContainer .color-input-wrapper');
+            const previewColors = document.getElementById('previewColors');
+
+            let colorsHtml = '';
+            wrappers.forEach(wrapper => {
+                const colorInput = wrapper.querySelector('input[type="color"]');
+                const nameInput = wrapper.querySelector('input[type="text"]');
+                if (colorInput) {
+                    colorsHtml += `<div class="preview-color" style="background: ${colorInput.value};" title="${nameInput?.value || ''}"></div>`;
+                }
+            });
+
+            previewColors.innerHTML = colorsHtml;
+        }
+
+        // Get all image URLs (with Google Drive conversion)
+        function getImageUrls() {
+            const inputs = document.querySelectorAll('input[name="imageUrls[]"]');
+            return Array.from(inputs)
+                .map(input => convertToDirectUrl(input.value.trim()))
+                .filter(url => url);
+        }
+
+        // Get all colors
+        function getColors() {
+            const wrappers = document.querySelectorAll('#colorsContainer .color-input-wrapper');
+            const colors = [];
+            wrappers.forEach(wrapper => {
+                const colorInput = wrapper.querySelector('input[type="color"]');
+                const nameInput = wrapper.querySelector('input[type="text"]');
+                if (colorInput && colorInput.value) {
+                    colors.push({
+                        hex: colorInput.value,
+                        name: nameInput?.value || ''
+                    });
+                }
+            });
+            return colors;
+        }
+
+        // Add event listeners for live preview
+        document.getElementById('itemName').addEventListener('input', updatePreview);
+        document.getElementById('category').addEventListener('change', () => { updatePreview(); updatePreviewImages(); });
+        document.getElementById('description').addEventListener('input', updatePreview);
+        document.getElementById('price').addEventListener('input', updatePreview);
+        document.getElementById('quantity').addEventListener('input', updatePreview);
+
+        // Add listener to first image input
+        document.querySelector('input[name="imageUrls[]"]').addEventListener('input', updatePreviewImages);
+
+        // Form submission handler
+        document.getElementById('addItemForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const submitBtn = document.querySelector('.btn-submit');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Hide previous messages
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+            // Get form data with multiple images and colors
+            const imageUrls = getImageUrls();
+            const colors = getColors();
+
+            const product = {
+                name: document.getElementById('itemName').value.trim(),
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value.trim(),
+                price: parseFloat(document.getElementById('price').value),
+                quantity: parseInt(document.getElementById('quantity').value),
+                imageUrl: imageUrls[0] || '', // Primary image for backward compatibility
+                imageUrls: imageUrls, // All images
+                colors: colors, // Color options
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                // Add to Firestore
+                const docRef = await db.collection('products').add(product);
+                console.log('Product added with ID:', docRef.id);
+
+                // Show success message
+                successMessage.style.display = 'block';
+
+                // Reset form and preview
+                this.reset();
+                resetPreview();
+
+                // Scroll to top to show success message
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Error adding product:', error);
+                errorMessage.style.display = 'block';
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Item';
+            }
+        });
+
+        function resetPreview() {
+            document.getElementById('previewName').textContent = 'Product Name';
+            document.getElementById('previewCategory').textContent = 'Category';
+            document.getElementById('previewDescription').textContent = 'Product description will appear here...';
+            document.getElementById('previewPrice').textContent = 'Rs.0';
+            document.getElementById('previewStock').textContent = 'In Stock';
+            document.getElementById('previewStock').className = 'preview-stock';
+            document.getElementById('previewMainImage').innerHTML = '<span class="placeholder-emoji">🎁</span>';
+            document.getElementById('previewGallery').style.display = 'none';
+            document.getElementById('previewColors').innerHTML = '<div class="preview-color" style="background: #d4a5a5;" title="Pink"></div>';
+
+            // Reset image inputs
+            const imageContainer = document.getElementById('imageUrlInputs');
+            imageContainer.innerHTML = `
+                <div class="image-url-row">
+                    <input type="url" name="imageUrls[]" placeholder="https://example.com/image1.jpg" oninput="updatePreviewImages()">
+                    <button type="button" class="remove-url" onclick="removeImageInput(this)" style="display:none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+
+            // Reset color inputs
+            const colorContainer = document.getElementById('colorsContainer');
+            const addBtn = colorContainer.querySelector('.add-color-btn');
+            colorContainer.innerHTML = '';
+            colorContainer.innerHTML = `
+                <div class="color-input-wrapper">
+                    <input type="color" value="#d4a5a5" onchange="updatePreviewColors()">
+                    <input type="text" placeholder="Color name" value="Pink" onchange="updatePreviewColors()">
+                    <button type="button" class="remove-color" onclick="removeColor(this)" style="display:none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <button type="button" class="add-color-btn" onclick="addColorInput()">
+                    <i class="fas fa-plus"></i> Add Color
+                </button>
+            `;
+        }
+    </script>
+</body>
+
+</html>
