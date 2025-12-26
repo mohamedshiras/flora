@@ -515,14 +515,14 @@
         <div class="container">
             <div class="nav-content">
                 <div class="nav-links">
-                    <a href="index.html">HOME</a>
-                    <a href="index.html#products">PRODUCTS</a>
-                    <a href="index.html#about">ABOUT</a>
-                    <a href="index.html#contact">CONTACT</a>
+                    <a href="../index.html">HOME</a>
+                    <a href="../index.html#products">PRODUCTS</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
                 </div>
                 <div class="logo">HKZ MART</div>
                 <div class="nav-right">
-                    <a href="index.html" class="cart-btn">
+                    <a href="../index.html" class="cart-btn">
                         <i class="fas fa-home"></i> BACK TO SHOP
                     </a>
                 </div>
@@ -536,7 +536,7 @@
             <div class="add-item-wrapper">
                 <!-- Form Container -->
                 <div class="add-item-container">
-                    <a href="index.html" class="back-link">
+                    <a href="../index.html" class="back-link">
                         <i class="fas fa-arrow-left"></i> Back to Shop
                     </a>
 
@@ -692,7 +692,7 @@
             const isAdmin = await checkIfAdmin(user.email);
             if (!isAdmin) {
                 alert('Access denied. Admin privileges required.');
-                window.location.href = 'index.html';
+                window.location.href = '../index.html';
                 return;
             }
 

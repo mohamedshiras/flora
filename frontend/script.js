@@ -46,7 +46,7 @@ function updateAuthUI(user) {
     } else {
         // User is logged out
         authLinks.innerHTML = `
-            <a href="login.html" class="auth-link"><i class="fas fa-user"></i> Login</a>
+            <a href="frontend/login.html" class="auth-link"><i class="fas fa-user"></i> Login</a>
         `;
     }
 }
@@ -692,7 +692,7 @@ function proceedToCheckout() {
     if (!user) {
         showNotification('Please login to place an order');
         document.getElementById('cartModal').style.display = 'none';
-        window.location.href = 'login.html';
+        window.location.href = 'frontend/login.html';
         return;
     }
 

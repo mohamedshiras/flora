@@ -532,7 +532,7 @@
             <nav class="admin-nav">
                 <a href="admin.html" class="active">Orders</a>
                 <a href="additem.html">Add Product</a>
-                <a href="index.html">View Store</a>
+                <a href="../index.html">View Store</a>
             </nav>
             <div class="admin-user">
                 <span id="adminName">Admin</span>
@@ -659,7 +659,7 @@
             // Verify admin status
             const isAdmin = await checkIfAdmin(user.email);
             if (!isAdmin) {
-                window.location.href = 'index.html';
+                window.location.href = '../index.html';
                 return;
             }
 
