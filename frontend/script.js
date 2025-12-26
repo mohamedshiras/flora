@@ -203,11 +203,10 @@ function createProductCard(product) {
 
 // Render all products to the grid
 function renderProducts(products) {
-    const grid = document.getElementById('productsGrid');
     const loading = document.getElementById('productsLoading');
-    const empty = document.getElementById('productsEmpty');
+    const categorySections = document.getElementById('categorySections');
 
-    if (!grid) return; // Not on main page
+    if (!categorySections) return; // Not on main page
 
     // Store products globally
     allProducts = products;
@@ -215,16 +214,48 @@ function renderProducts(products) {
     // Hide loading
     if (loading) loading.style.display = 'none';
 
-    if (products.length === 0) {
-        // Show empty state
-        if (empty) empty.style.display = 'block';
-        grid.innerHTML = '';
-        return;
-    }
+    // Define all categories in order
+    const categories = [
+        'scrunchies',
+        'keytags',
+        'hairclips',
+        'flowerbouquets',
+        'flowerpots',
+        'giftboxes',
+        'chocoboxes',
+        'chocobouquets'
+    ];
 
-    // Hide empty state and render products
-    if (empty) empty.style.display = 'none';
-    grid.innerHTML = products.map(createProductCard).join('');
+    // Group products by category
+    const productsByCategory = {};
+    categories.forEach(cat => productsByCategory[cat] = []);
+    
+    products.forEach(product => {
+        const cat = product.category?.toLowerCase();
+        if (productsByCategory[cat]) {
+            productsByCategory[cat].push(product);
+        }
+    });
+
+    // Render each category
+    categories.forEach(category => {
+        const section = document.getElementById(`category-${category}`);
+        if (!section) return;
+
+        const grid = section.querySelector('.products-grid');
+        const emptyMsg = section.querySelector('.category-empty');
+        const categoryProducts = productsByCategory[category];
+
+        if (categoryProducts.length > 0) {
+            grid.innerHTML = categoryProducts.map(createProductCard).join('');
+            grid.style.display = 'grid';
+            if (emptyMsg) emptyMsg.style.display = 'none';
+        } else {
+            grid.innerHTML = '';
+            grid.style.display = 'none';
+            if (emptyMsg) emptyMsg.style.display = 'block';
+        }
+    });
 }
 
 // ==================== PRODUCT MODAL ====================

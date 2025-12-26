@@ -536,10 +536,87 @@ body {
     margin-bottom: 30px;
 }
 
+/* Category Sections */
+.category-section {
+    margin-bottom: 60px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid #f0e6e6;
+}
+
+.category-section:last-child {
+    border-bottom: none;
+}
+
+.category-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.category-header .category-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.category-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.category-header .category-pricing {
+    color: #d4a5a5;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.category-header .category-offer {
+    background: linear-gradient(135deg, #d4a5a5 0%, #c99393 100%);
+    color: white;
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+.category-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    font-style: italic;
+    background: #fdf6f6;
+    border-radius: 15px;
+    display: none;
+}
+
+#categorySections {
+    margin-top: 40px;
+}
+
 .products-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 30px;
+}
+
+@media (max-width: 992px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .category-header h3 {
+        font-size: 1.4rem;
+    }
 }
 
 /* Product Card Styles */
