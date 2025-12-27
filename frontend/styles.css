@@ -59,6 +59,14 @@ body {
     font-size: 15px;
     letter-spacing: 3px;
     font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.logo img {
+    height: 32px;
 }
 
 .nav-right {
