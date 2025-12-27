@@ -35,8 +35,10 @@ body {
 }
 
 .nav-links {
+    flex: 1;
     display: flex;
     gap: 30px;
+    justify-content: flex-start;
 }
 
 .nav-links a {
@@ -55,6 +57,7 @@ body {
 }
 
 .logo {
+    flex: 1;
     font-weight: 600;
     font-size: 15px;
     letter-spacing: 3px;
@@ -63,6 +66,7 @@ body {
     align-items: center;
     flex-direction: row;
     gap: 8px;
+    justify-content: center;
 }
 
 .logo img {
@@ -70,9 +74,11 @@ body {
 }
 
 .nav-right {
+    flex: 1;
     display: flex;
     gap: 20px;
     align-items: center;
+    justify-content: flex-end;
 }
 
 .cart-btn {
