@@ -211,7 +211,7 @@ function createOrderCardHTML(orderId, order) {
         <div class="order-card status-${status}">
             <div class="order-header">
                 <div class="order-id-date">
-                    <span class="order-id-text">Order #${orderId.slice(-8).toUpperCase()}</span>
+                    <span class="order-id-text">Order #${orderId}</span>
                     <span class="order-date">${formattedDate}</span>
                 </div>
                 <span class="order-status ${status}">${status}</span>
